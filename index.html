@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRAVE Conflict Workshop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .message.bot {
+            background: #f0f4f8;
+            border-left: 4px solid #667eea;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: 20%;
+        }
+
+        .profile-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            margin: 10px 0;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .loading:after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .error {
+            background: #fee;
+            border: 2px solid #f88;
+            color: #c00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #efe;
+            border: 2px solid #8f8;
+            color: #060;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .scenario-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .scenario-card:hover {
+            border-color: #667eea;
+            background: #f0f4f8;
+        }
+
+        .scenario-card.selected {
+            border-color: #667eea;
+            background: #f0f4f8;
+        }
+
+        .scenario-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            background: #f0f4f8;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        iframe {
+            width: 100%;
+            min-height: 600px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧭 BRAVE Conflict Workshop</h1>
+            <p>Map your conflict style. Build constructive patterns.</p>
+        </div>
+
+        <div class="progress" id="progress">Step 0: Profile Assessment</div>
+
+        <div class="content">
+            <!-- Step 0: Airtable Form -->
+            <div id="step0" class="step active">
+                <div class="message bot">
+                    <h2>Welcome to the BRAVE Conflict Workshop</h2>
+                    <p>This workshop will help you understand your natural conflict style and develop strategies for more constructive disagreements.</p>
+                    <p style="margin-top: 15px;"><strong>First, complete the BRAVE Big 5 personality assessment below (takes 2 minutes):</strong></p>
+                </div>
+                
+                <iframe 
+                    class="airtable-embed" 
+                    src="https://airtable.com/embed/appibk54tnw9QhQ49/pagJgIy6LKWSLQqPb/form" 
+                    frameborder="0" 
+                    onmousewheel="" 
+                    width="100%" 
+                    height="600" 
+                    style="background: transparent; border: 1px solid #ccc; border-radius: 8px; margin: 20px 0;">
+                </iframe>
+
+                <div class="message bot" style="background: #fffbea; border-left-color: #ffd700;">
+                    <p><strong>⚠️ After submitting the form above:</strong></p>
+                    <p>Please enter the email address you used in the form to continue to the workshop.</p>
+                </div>
+
+                <input type="email" id="emailInput" placeholder="Enter your email address..." />
+                <button onclick="loadSession()">Continue to Workshop</button>
+                <div id="lookupError"></div>
+            </div>
+
+            <!-- Step 1: Conflict Style -->
+            <div id="step1" class="step">
+                <div id="step1Messages"></div>
+                <textarea id="step1Input" placeholder="Describe your natural approach to conflict..."></textarea>
+                <button onclick="submitStep1()" id="step1Btn">Submit</button>
+                <div id="step1Error"></div>
+            </div>
+
+            <!-- Step 2: When Helps/Holds Back -->
+            <div id="step2" class="step">
+                <div id="step2Messages"></div>
+                <label><strong>When does your style HELP you in conflict?</strong></label>
+                <textarea id="step2Helps" placeholder="When can you just be natural?"></textarea>
+                
+                <label style="margin-top: 15px;"><strong>When does your style HOLD YOU BACK?</strong></label>
+                <textarea id="step2Holds" placeholder="When do you need to push yourself?"></textarea>
+                
+                <button onclick="submitStep2()" id="step2Btn">Submit</button>
+                <div id="step2Error"></div>
+            </div>
+
+            <!-- Step 3: Commitments -->
+            <div id="step3" class="step">
+                <div id="step3Messages"></div>
+                <textarea id="step3Input" placeholder="List 1-2 micro-commitments for future conflicts..."></textarea>
+                <button onclick="submitStep3()" id="step3Btn">Submit</button>
+                <div id="step3Error"></div>
+            </div>
+
+            <!-- Step 4: Leadership Challenge -->
+            <div id="step4" class="step">
+                <div id="step4Messages"></div>
+                
+                <div id="scenarioSelection">
+                    <p><strong>Choose one leadership challenge to reflect on:</strong></p>
+                    
+                    <div class="scenario-card" onclick="selectScenario(1)">
+                        <h3>⚔️ Challenge 1: The Overly Demanding Boss</h3>
+                        <p>Your boss keeps adding more responsibilities. You're struggling to keep up, but worried about seeming difficult.</p>
+                    </div>
+
+                    <div class="scenario-card" onclick="selectScenario(2)">
+                        <h3>🤝 Challenge 2: The Uneven Study Group or Project Team</h3>
+                        <p>Some team members carry the load while others coast. Frustration is building but no one names the problem directly.</p>
+                    </div>
+
+                    <div class="scenario-card" onclick="selectScenario(3)">
+                        <h3>🏡 Challenge 3: The Roommate Rituals or Close-Quarters Colleague</h3>
+                        <p>Daily habit clashes with someone you genuinely like. What started as minor annoyances now feel like disrespect.</p>
+                    </div>
+                </div>
+
+                <div id="scenarioResponse" style="display: none;">
+                    <label><strong>Your reflection on this challenge:</strong></label>
+                    <textarea id="step4Response" placeholder="How does your BRAVE profile shape your response? What will you do differently?"></textarea>
+                    
+                    <label style="margin-top: 15px;"><strong>Your specific commitment:</strong></label>
+                    <textarea id="step4Commitment" placeholder="What I'll do differently next time..."></textarea>
+                    
+                    <button onclick="submitStep4()" id="step4Btn">Submit</button>
+                </div>
+                <div id="step4Error"></div>
+            </div>
+
+            <!-- Complete -->
+            <div id="stepComplete" class="step">
+                <div class="message bot success">
+                    <h2 style="text-align: center;">🎉 Workshop Complete!</h2>
+                    <p><strong>Well done!</strong> You've mapped your natural conflict style using the BRAVE framework. These patterns won't change overnight—but now you know what to pay attention to. That's where growth starts.</p>
+                </div>
+                <div id="completeMessages"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const WEBHOOKS = {
+            lookup: 'https://hook.eu2.make.com/h197hejhqtfhoeab7diidk9488747kgo',
+            step1: 'https://hook.eu2.make.com/lvk3mmq8wcwr0c3v6cgw7thtpzinpzwi',
+            step2: 'https://hook.eu2.make.com/oks4usf72tsvye331742k35gdlgurmyg',
+            step3: 'https://hook.eu2.make.com/3xp4gp60ty56xvsgbh7joh6v28bq9i9c',
+            step4: 'https://hook.eu2.make.com/zctqzvqr5hhhm859j5klau7c1apd3usb'
+        };
+
+        // State
+        let sessionData = {
+            session_id: null,
+            student_name: null,
+            profile: null,
+            email: null
+        };
+
+        let selectedScenario = null;
+
+        // Utility functions
+        function showStep(stepId) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        function updateProgress(text) {
+            document.getElementById('progress').textContent = text;
+        }
+
+        function addMessage(containerId, type, html) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = html;
+            container.appendChild(div);
+            div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        function clearError(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function callWebhook(url, data) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        }
+
+        // Check URL for email parameter
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            if (emailParam) {
+                document.getElementById('emailInput').value = emailParam;
+                // Auto-load session after a brief delay
+                setTimeout(() => loadSession(), 500);
+            }
+        });
+
+        // Step 0: Load Session
+        async function loadSession() {
+            const email = document.getElementById('emailInput').value.trim();
+            
+            if (!email) {
+                showError('lookupError', 'Please enter your email address');
+                return;
+            }
+
+            clearError('lookupError');
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = 'Loading<span class="loading"></span>';
+
+            try {
+                const result = await callWebhook(WEBHOOKS.lookup, { email });
+                
+                if (!result.session_id) {
+                    throw new Error('No session found for this email. Please make sure you completed the form above first.');
+                }
+
+                sessionData = {
+                    session_id: result.session_id,
+                    student_name: result.student_name,
+                    profile: result.profile,
+                    email: email
+                };
+
+                // Start workshop
+                startWorkshop();
+
+            } catch (error) {
+                console.error('Session lookup error:', error);
+                showError('lookupError', error.message || 'Could not find your session. Please check your email and try again.');
+                btn.disabled = false;
+                btn.textContent = 'Continue to Workshop';
+            }
+        }
+
+        function startWorkshop() {
+            updateProgress('Step 1: Describe Your Conflict Style');
+            showStep('step1');
+            
+            addMessage('step1Messages', 'bot', `
+                <h3>Welcome, ${sessionData.student_name}!</h3>
+                <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
+                <p>Now that you understand your tendencies, let's get specific about YOUR conflict style.</p>
+                <p><strong>What IS your approach to conflict resolution?</strong></p>
+                <p>How do your specific tendencies (Agreeableness, Balance, Exploration) play into this?</p>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Write 3–5 sentences describing your natural pattern.</p>
+            `);
+        }
+
+        // Step 1: Conflict Style
+        async function submitStep1() {
+            const response = document.getElementById('step1Input').value.trim();
+            
+            if (response.length < 50) {
+                showError('step1Error', 'Please write at least 50 characters (3-5 sentences)');
+                return;
+            }
+
+            clearError('step1Error');
+            const btn = document.getElementById('step1Btn');
+            btn.disabled = true;
+            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
+
+            try {
+                addMessage('step1Messages', 'user', response);
+
+                const result = await callWebhook(WEBHOOKS.step1, {
+                    session_id: sessionData.session_id,
+                    response: response,
+                    profile: sessionData.profile
+                });
+
+                addMessage('step1Messages', 'bot', `
+                    <strong>Claude's Feedback:</strong><br>
+                    ${result.feedback}
+                `);
+
+                // Continue to Step 2
+                setTimeout(() => {
+                    updateProgress('Step 2: When to Be Yourself / When to Push');
+                    showStep('step2');
+                    
+                    addMessage('step2Messages', 'bot', `
+                        <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
+                        <p>Reflect on what came up in your description.</p>
+                        <p><strong>Now let's explore when your tendencies work for you and when they work against you.</strong></p>
+                    `);
+                }, 1000);
+
+            } catch (error) {
+                console.error('Step 1 error:', error);
+                showError('step1Error', 'Error getting feedback. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Submit';
+            }
+        }
+
+        // Step 2: When Helps/Holds Back
+        async function submitStep2() {
+            const helps = document.getElementById('step2Helps').value.trim();
+            const holds = document.getElementById('step2Holds').value.trim();
+            
+            if (helps.length < 30 || holds.length < 30) {
+                showError('step2Error', 'Please write at least one example for each (30+ characters)');
+                return;
+            }
+
+            clearError('step2Error');
+            const btn = document.getElementById('step2Btn');
+            btn.disabled = true;
+            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
+
+            try {
+                addMessage('step2Messages', 'user', `
+                    <strong>When it helps:</strong> ${helps}<br><br>
+                    <strong>When it holds back:</strong> ${holds}
+                `);
+
+                const result = await callWebhook(WEBHOOKS.step2, {
+                    session_id: sessionData.session_id,
+                    when_helps: helps,
+                    when_holds_back: holds,
+                    profile: sessionData.profile
+                });
+
+                addMessage('step2Messages', 'bot', `
+                    <strong>Claude's Feedback:</strong><br>
+                    ${result.feedback}
+                `);
+
+                // Continue to Step 3
+                setTimeout(() => {
+                    updateProgress('Step 3: Your Commitments');
+                    showStep('step3');
+                    
+                    addMessage('step3Messages', 'bot', `
+                        <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
+                        <p><strong>What are 1–2 things you want to pay attention to in future conflicts?</strong></p>
+                        <p>This could be:</p>
+                        <ul>
+                            <li>A technique from your profile insights</li>
+                            <li>A behavior you want to experiment with</li>
+                            <li>A pattern you want to interrupt</li>
+                        </ul>
+                        <p>List 1–2 micro-commitments.</p>
+                    `);
+                }, 1000);
+
+            } catch (error) {
+                console.error('Step 2 error:', error);
+                showError('step2Error', 'Error getting feedback. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Submit';
+            }
+        }
+
+        // Step 3: Commitments
+        async function submitStep3() {
+            const commitments = document.getElementById('step3Input').value.trim();
+            
+            if (commitments.length < 30) {
+                showError('step3Error', 'Please write at least 30 characters');
+                return;
+            }
+
+            clearError('step3Error');
+            const btn = document.getElementById('step3Btn');
+            btn.disabled = true;
+            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
+
+            try {
+                addMessage('step3Messages', 'user', commitments);
+
+                const result = await callWebhook(WEBHOOKS.step3, {
+                    session_id: sessionData.session_id,
+                    commitments: commitments,
+                    profile: sessionData.profile
+                });
+
+                addMessage('step3Messages', 'bot', `
+                    <strong>Claude's Feedback:</strong><br>
+                    ${result.feedback}
+                `);
+
+                // Continue to Step 4
+                setTimeout(() => {
+                    updateProgress('Step 4: Leadership Challenge');
+                    showStep('step4');
+                    
+                    addMessage('step4Messages', 'bot', `
+                        <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
+                        <p><strong>Apply your insights to a real leadership challenge.</strong></p>
+                        <p>Choose one scenario below that resonates with you:</p>
+                    `);
+                }, 1000);
+
+            } catch (error) {
+                console.error('Step 3 error:', error);
+                showError('step3Error', 'Error getting feedback. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Submit';
+            }
+        }
+
+        // Step 4: Leadership Challenge
+        function selectScenario(num) {
+            selectedScenario = num;
+            
+            // Highlight selected
+            document.querySelectorAll('.scenario-card').forEach((card, idx) => {
+                card.classList.toggle('selected', idx + 1 === num);
+            });
+
+            // Show response area
+            document.getElementById('scenarioSelection').style.display = 'none';
+            document.getElementById('scenarioResponse').style.display = 'block';
+
+            const scenarios = [
+                'The Overly Demanding Boss',
+                'The Uneven Study Group or Project Team',
+                'The Roommate Rituals or Close-Quarters Colleague'
+            ];
+
+            addMessage('step4Messages', 'user', `I chose: ${scenarios[num - 1]}`);
+            addMessage('step4Messages', 'bot', `
+                <p>Great choice. Now reflect on how your BRAVE profile (${sessionData.profile}) shapes your response to this situation.</p>
+                <p><strong>Consider:</strong></p>
+                <ul>
+                    <li>What's your default reaction?</li>
+                    <li>How do your tendencies help or hinder you here?</li>
+                    <li>What's ONE specific thing you'll try differently?</li>
+                </ul>
+            `);
+        }
+
+        async function submitStep4() {
+            const response = document.getElementById('step4Response').value.trim();
+            const commitment = document.getElementById('step4Commitment').value.trim();
+            
+            if (response.length < 50 || commitment.length < 20) {
+                showError('step4Error', 'Please complete both fields with sufficient detail');
+                return;
+            }
+
+            clearError('step4Error');
+            const btn = document.getElementById('step4Btn');
+            btn.disabled = true;
+            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
+
+            try {
+                addMessage('step4Messages', 'user', `
+                    <strong>My reflection:</strong> ${response}<br><br>
+                    <strong>My commitment:</strong> ${commitment}
+                `);
+
+                const result = await callWebhook(WEBHOOKS.step4, {
+                    session_id: sessionData.session_id,
+                    challenge_choice: selectedScenario.toString(),
+                    response: response,
+                    commitment: commitment,
+                    profile: sessionData.profile
+                });
+
+                addMessage('step4Messages', 'bot', `
+                    <strong>Claude's Feedback:</strong><br>
+                    ${result.feedback}
+                `);
+
+                // Complete workshop
+                setTimeout(() => {
+                    updateProgress('Workshop Complete! ✅');
+                    showStep('stepComplete');
+                    
+                    addMessage('completeMessages', 'bot', `
+                        <h3>🎯 Your Workshop Summary</h3>
+                        <div style="background: #f0f4f8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <p><strong>Name:</strong> ${sessionData.student_name}</p>
+                            <p><strong>BRAVE Profile:</strong> ${sessionData.profile}</p>
+                            <p><strong>Session ID:</strong> ${sessionData.session_id}</p>
+                        </div>
+                        <p>All your responses have been saved to your session. You can now:</p>
+                        <ul>
+                            <li>Review your insights in the assignment survey</li>
+                            <li>Share learnings with your study group</li>
+                            <li>Practice your commitments in real conflicts</li>
+                        </ul>
+                        <p style="margin-top: 20px;">
+                            <a href="https://go.martinschweinsberg.de/personal" target="_blank" style="color: #667eea; font-weight: 600;">
+                                📤 Submit Your Reflection Survey →
+                            </a>
+                        </p>
+                    `);
+                }, 1000);
+
+            } catch (error) {
+                console.error('Step 4 error:', error);
+                showError('step4Error', 'Error getting feedback. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Submit';
+            }
+        }
+    </script>
+</body>
+</html>
