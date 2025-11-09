@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
@@ -45,16 +45,15 @@
             opacity: 0.95;
         }
 
-        .content {
+        .chat-container {
             padding: 30px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
-        .step {
-            display: none;
-        }
-
-        .step.active {
-            display: block;
+        .message {
+            margin-bottom: 20px;
             animation: fadeIn 0.5s ease-in;
         }
 
@@ -63,22 +62,20 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .message {
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: 12px;
-            animation: fadeIn 0.5s ease-in;
-        }
-
         .message.bot {
             background: #f0f4f8;
+            padding: 20px;
+            border-radius: 12px;
             border-left: 4px solid #667eea;
         }
 
         .message.user {
             background: #667eea;
             color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
             margin-left: 20%;
+            text-align: right;
         }
 
         .profile-badge {
@@ -92,6 +89,12 @@
             font-weight: 600;
         }
 
+        .input-area {
+            padding: 20px 30px 30px;
+            border-top: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+
         input[type="text"], textarea {
             width: 100%;
             padding: 15px;
@@ -99,7 +102,6 @@
             border-radius: 8px;
             font-size: 1em;
             font-family: inherit;
-            margin: 10px 0;
             transition: border-color 0.3s;
         }
 
@@ -109,7 +111,7 @@
         }
 
         textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
         }
 
@@ -126,48 +128,47 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        button:hover:not(:disabled) {
+        button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .loading {
-            display: inline-block;
-            margin-left: 10px;
+        .video-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            font-size: 0.9em;
         }
 
-        .loading:after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
+        .video-table th, .video-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
+        .video-table th {
+            background: #f0f4f8;
+            font-weight: 600;
         }
 
-        .error {
-            background: #fee;
-            border: 2px solid #f88;
-            color: #c00;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
+        .video-table a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
         }
 
-        .success {
-            background: #efe;
-            border: 2px solid #8f8;
-            color: #060;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
+        .video-table a:hover {
+            text-decoration: underline;
         }
 
         .scenario-card {
@@ -194,19 +195,73 @@
             margin-bottom: 10px;
         }
 
-        .progress {
-            background: #f0f4f8;
-            padding: 15px;
-            text-align: center;
+        .reset-button {
+            background: #dc3545;
             font-size: 0.9em;
-            color: #666;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            margin-left: 10px;
         }
 
-        iframe {
-            width: 100%;
-            min-height: 600px;
-            border: none;
+        .progress-indicator {
+            text-align: center;
+            padding: 10px;
+            background: #f0f4f8;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .survey-box {
+            background: #fffbea;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .survey-box h3 {
+            color: #b8860b;
+            margin-bottom: 10px;
+        }
+
+        .survey-link {
+            display: block;
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .survey-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .chat-container {
+                padding: 20px;
+                max-height: 500px;
+            }
+
+            .input-area {
+                padding: 15px 20px 20px;
+            }
+
+            .message.user {
+                margin-left: 10%;
+            }
         }
     </style>
 </head>
@@ -214,493 +269,1363 @@
     <div class="container">
         <div class="header">
             <h1>🧭 BRAVE Conflict Workshop</h1>
-            <p>Map your conflict style. Build constructive patterns.</p>
+            <p>Map your conflict style. Help a peer succeed.</p>
+        </div>
+        
+        <div class="progress-indicator" id="progressIndicator">
+            Welcome
         </div>
 
-        <div class="progress" id="progress">Step 0: Profile Assessment</div>
+        <div class="chat-container" id="chatContainer"></div>
 
-        <div class="content">
-            <!-- Step 0: Airtable Form -->
-            <div id="step0" class="step active">
-                <div class="message bot">
-                    <h2>Welcome to the BRAVE Conflict Workshop</h2>
-                    <p>This workshop will help you understand your natural conflict style and develop strategies for more constructive disagreements.</p>
-                    <p style="margin-top: 15px;"><strong>First, complete the BRAVE Big 5 personality assessment below (takes 2 minutes):</strong></p>
-                </div>
-                
-                <iframe 
-                    class="airtable-embed" 
-                    src="https://airtable.com/embed/appibk54tnw9QhQ49/pagttJZFA7VqzmgGj/form" 
-                    frameborder="0" 
-                    onmousewheel="" 
-                    width="100%" 
-                    height="600" 
-                    style="background: transparent; border: 1px solid #ccc; border-radius: 8px; margin: 20px 0;">
-                </iframe>
-
-                <div class="message bot" style="background: #fffbea; border-left-color: #ffd700;">
-                    <p><strong>⚠️ After submitting the form above:</strong></p>
-                    <p>Please enter the email address you used in the form to continue to the workshop.</p>
-                </div>
-
-                <input type="email" id="emailInput" placeholder="Enter your email address..." />
-                <button onclick="loadSession()">Continue to Workshop</button>
-                <div id="lookupError"></div>
-            </div>
-
-            <!-- Step 1: Conflict Style -->
-            <div id="step1" class="step">
-                <div id="step1Messages"></div>
-                <textarea id="step1Input" placeholder="Describe your natural approach to conflict..."></textarea>
-                <button onclick="submitStep1()" id="step1Btn">Submit</button>
-                <div id="step1Error"></div>
-            </div>
-
-            <!-- Step 2: When Helps/Holds Back -->
-            <div id="step2" class="step">
-                <div id="step2Messages"></div>
-                <label><strong>When does your style HELP you in conflict?</strong></label>
-                <textarea id="step2Helps" placeholder="When can you just be natural?"></textarea>
-                
-                <label style="margin-top: 15px;"><strong>When does your style HOLD YOU BACK?</strong></label>
-                <textarea id="step2Holds" placeholder="When do you need to push yourself?"></textarea>
-                
-                <button onclick="submitStep2()" id="step2Btn">Submit</button>
-                <div id="step2Error"></div>
-            </div>
-
-            <!-- Step 3: Commitments -->
-            <div id="step3" class="step">
-                <div id="step3Messages"></div>
-                <textarea id="step3Input" placeholder="List 1-2 micro-commitments for future conflicts..."></textarea>
-                <button onclick="submitStep3()" id="step3Btn">Submit</button>
-                <div id="step3Error"></div>
-            </div>
-
-            <!-- Step 4: Leadership Challenge -->
-            <div id="step4" class="step">
-                <div id="step4Messages"></div>
-                
-                <div id="scenarioSelection">
-                    <p><strong>Choose one leadership challenge to reflect on:</strong></p>
-                    
-                    <div class="scenario-card" onclick="selectScenario(1)">
-                        <h3>⚔️ Challenge 1: The Overly Demanding Boss</h3>
-                        <p>Your boss keeps adding more responsibilities. You're struggling to keep up, but worried about seeming difficult.</p>
-                    </div>
-
-                    <div class="scenario-card" onclick="selectScenario(2)">
-                        <h3>🤝 Challenge 2: The Uneven Study Group or Project Team</h3>
-                        <p>Some team members carry the load while others coast. Frustration is building but no one names the problem directly.</p>
-                    </div>
-
-                    <div class="scenario-card" onclick="selectScenario(3)">
-                        <h3>🏡 Challenge 3: The Roommate Rituals or Close-Quarters Colleague</h3>
-                        <p>Daily habit clashes with someone you genuinely like. What started as minor annoyances now feel like disrespect.</p>
-                    </div>
-                </div>
-
-                <div id="scenarioResponse" style="display: none;">
-                    <label><strong>Your reflection on this challenge:</strong></label>
-                    <textarea id="step4Response" placeholder="How does your BRAVE profile shape your response? What will you do differently?"></textarea>
-                    
-                    <label style="margin-top: 15px;"><strong>Your specific commitment:</strong></label>
-                    <textarea id="step4Commitment" placeholder="What I'll do differently next time..."></textarea>
-                    
-                    <button onclick="submitStep4()" id="step4Btn">Submit</button>
-                </div>
-                <div id="step4Error"></div>
-            </div>
-
-            <!-- Complete -->
-            <div id="stepComplete" class="step">
-                <div class="message bot success">
-                    <h2 style="text-align: center;">🎉 Workshop Complete!</h2>
-                    <p><strong>Well done!</strong> You've mapped your natural conflict style using the BRAVE framework. These patterns won't change overnight—but now you know what to pay attention to. That's where growth starts.</p>
-                </div>
-                <div id="completeMessages"></div>
-            </div>
+        <div class="input-area">
+            <div id="inputArea"></div>
         </div>
     </div>
 
     <script>
-        // Configuration
-        const WEBHOOKS = {
-            lookup: 'https://hook.eu2.make.com/h197hejhqtfhoea57diidk9488747kgo',
-            step1: 'https://hook.eu2.make.com/lvk3mmq8wcwr0c3v6cgw7thtpzinpzwi',
-            step2: 'https://hook.eu2.make.com/oks4usf72tsvye331742k35gdlgurmyg',
-            step3: 'https://hook.eu2.make.com/3xp4gp60ty56xvsgbh7joh6v28bq9i9c',
-            step4: 'https://hook.eu2.make.com/zctqzvqr5hhhm859j5klau7c1apd3usb'
-        };
+        // ======================
+        // WEBHOOK CONFIGURATION
+        // ======================
 
-        // State
-        let sessionData = {
-            session_id: null,
-            student_name: null,
-            profile: null,
-            email: null
-        };
+        /**
+         * CONFIGURATION INSTRUCTIONS:
+         *
+         * Replace 'YOUR_WEBHOOK_ID_HERE' with your actual Make.com webhook ID.
+         *
+         * To get your webhook URL:
+         * 1. Go to Make.com and create a new scenario
+         * 2. Add a "Webhooks > Custom webhook" trigger
+         * 3. Copy the webhook URL (it will look like: https://hook.us1.make.com/abc123xyz...)
+         * 4. Paste the full URL below
+         *
+         * Example:
+         * const WEBHOOK_URL = 'https://hook.us1.make.com/abc123xyz456';
+         *
+         * The webhook will receive JSON data with the following structure:
+         * {
+         *   "studentName": "John",
+         *   "profile": "Agreeableness:Low, Balance:High, Exploration:Low",
+         *   "profileKey": "A↓ B↑ E↓",
+         *   "responses": {
+         *     "step1": "My conflict style description...",
+         *     "step2_helps": "When my tendencies help...",
+         *     "step2_holds": "When they hold me back...",
+         *     "step3": "What I'll pay attention to...",
+         *     "scenario": "boss",
+         *     "scenarioResponse": "My reflection...",
+         *     "commitment": "What I'll do differently...",
+         *     "closing": "My closing thoughts..."
+         *   },
+         *   "milestone": "completed",
+         *   "currentStep": "complete",
+         *   "completedDate": "2024-01-15T10:30:00.000Z",
+         *   "timestamp": 1705318200000
+         * }
+         */
+        const WEBHOOK_URL = 'https://hook.us1.make.com/YOUR_WEBHOOK_ID_HERE';
 
-        let selectedScenario = null;
+        // ======================
+        // UTILITY FUNCTIONS
+        // ======================
 
-        // Utility functions
-        function showStep(stepId) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById(stepId).classList.add('active');
-        }
-
-        function updateProgress(text) {
-            document.getElementById('progress').textContent = text;
-        }
-
-        function addMessage(containerId, type, html) {
-            const container = document.getElementById(containerId);
-            const div = document.createElement('div');
-            div.className = `message ${type}`;
-            div.innerHTML = html;
-            container.appendChild(div);
-            div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        function showError(elementId, message) {
-            const el = document.getElementById(elementId);
-            el.innerHTML = `<div class="error">${message}</div>`;
-        }
-
-        function clearError(elementId) {
-            document.getElementById(elementId).innerHTML = '';
-        }
-
-        async function callWebhook(url, data) {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            return await response.json();
-        }
-
-        // Check URL for email parameter
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const emailParam = urlParams.get('email');
-            if (emailParam) {
-                document.getElementById('emailInput').value = emailParam;
-                // Auto-load session after a brief delay
-                setTimeout(() => loadSession(), 500);
-            }
-        });
-
-        // Step 0: Load Session
-        async function loadSession() {
-            const email = document.getElementById('emailInput').value.trim();
-            
-            if (!email) {
-                showError('lookupError', 'Please enter your email address');
-                return;
-            }
-
-            clearError('lookupError');
-            const btn = event.target;
-            btn.disabled = true;
-            btn.innerHTML = 'Loading<span class="loading"></span>';
-
+        /**
+         * Safely sends data to Make.com webhook with proper JSON encoding
+         * Uses JSON.stringify which automatically handles all special characters including:
+         * - Quotes (both single and double)
+         * - Apostrophes
+         * - Newlines, tabs, and other whitespace
+         * - Backslashes
+         * - Unicode characters
+         *
+         * @param {Object} data - The data object to send
+         * @returns {Promise<Object>} Response from webhook
+         */
+        async function sendToWebhook(data) {
             try {
-                const result = await callWebhook(WEBHOOKS.lookup, { email });
-                
-                if (!result.session_id) {
-                    throw new Error('No session found for this email. Please make sure you completed the form above first.');
+                // JSON.stringify automatically and correctly escapes all special characters
+                // No manual escaping needed - doing so would cause double-escaping
+                const payload = JSON.stringify(data);
+
+                // Validate JSON is well-formed (this will throw if data contains circular references, etc.)
+                JSON.parse(payload);
+
+                console.log('Webhook payload preview:', payload.substring(0, 200) + '...');
+
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: payload
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Webhook returned status ${response.status}: ${response.statusText}`);
                 }
 
-                sessionData = {
-                    session_id: result.session_id,
-                    student_name: result.student_name,
-                    profile: result.profile,
-                    email: email
+                return await response.json();
+            } catch (error) {
+                console.error('Error sending data to webhook:', error);
+                // Don't throw - we don't want to break the user experience if webhook fails
+                return { success: false, error: error.message };
+            }
+        }
+
+        // ======================
+        // STATE MANAGEMENT
+        // ======================
+
+        const PROFILES = {
+            'low-high-low': {
+                key: 'A↓ B↑ E↓',
+                name: 'Agreeableness LOW + Balance HIGH + Exploration LOW',
+                video: 'https://gumlet.tv/watch/6752dbb5948718dd9426adc9',
+                feedback: `So your tendencies are such that your Agreeableness levels are low (suggesting you're free to speak your mind—you disagree with something and you don't mind sharing that), your Balance is high (it takes a lot for you to feel angry, sad, or anxious in conflict—this is typically very helpful because emotional reactivity often escalates conflict), and your Exploration levels are also low (suggesting you have a relatively firm view already on how things are, what the right course of action might be).
+
+**What this combination means in conflict:**
+If we look at these three tendencies together, the two that can be challenging in combination are low Agreeableness and low Exploration. When you're in conflict, your counterpart might perceive you as both someone who is disagreeable—and in their mind that's not just "Oh, she's free to speak her mind." They might perceive this as "This person is not friendly. He or she seems cold, distant. They seem as if they don't care about the relationship with me—and me, therefore, by extension."
+
+And two, this person doesn't seem open to other perspectives. They seem closed to considering that my view might also have some merit.
+
+**Your strategic opportunities:**
+When you are in conflict, I would suggest you try to push yourself on one of these dimensions.
+
+**On Agreeableness:** Consider something that negotiators recommend—be firm on the issues, tough on the issues, friendly to the person. You can still say what you think and still disagree on content. You might have a conflict about a task, but don't make it a conflict about the relationship. Be tough on the issues, but friendly to the person.
+
+**On Exploration:** Force yourself to practice considering that the other party might have a viewpoint or perspective that is worth listening to. At a minimum, even if you think they are wrong and you're convinced of it, at least make it seem as if you are considering their point of view. As if you were listening. As if you were open to another perspective. Because if you're not, and they feel like you are not listening to them, it's only going to make matters worse.`
+            },
+            'low-high-high': {
+                key: 'A↓ B↑ E↑',
+                name: 'Agreeableness LOW + Balance HIGH + Exploration HIGH',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb5948718dd9426adc4',
+                feedback: `So your tendencies are such that you are low on Agreeableness, you're high on Balance, and you're high on Exploration.
+
+**What this combination means in conflict:**
+In some ways, and for many conflicts, this can be an ideal combination of tendencies, actually. Your low Agreeableness indicates you're free to speak your mind. You're free to say that if you disagree with something, you're not held back by thinking, "Maybe they don't like it when I say this." Your high Balance helps you stay emotionally steady—you're unlikely to get angry, sad, or anxious in conflict. And that is typically helpful because strong emotions tend to fan the flames that already exist. Your high Exploration suggests you're open to new viewpoints. Your counterpart will recognize that yes, you have an opinion and yes, you disagree, but you're open to other perspectives, you're learning, you're trying to see whether there might be merit in what they're saying.
+
+**This is a powerful combination:**
+Low Agreeableness and high Exploration together—that's really powerful, especially if you remember one thing:
+
+**Your strategic opportunity:**
+For your low Agreeableness, one way this could become a challenge is if your counterpart perceives you not just as "Great, she speaks her mind," but also as cold, distant, someone who doesn't care about the relationship—and therefore doesn't care about the counterpart. That is very dangerous territory.
+
+So remember this negotiation slogan: Be tough on the issues, but friendly to the person. Continue to disagree on the content (Maybe you have conflict about how to do something, whether to do A, B, or C, in which order). Voice that disagreement—it can help your group and organization make better decisions. But at the same time, be friendly to the person. You might have to push yourself a little here, but try to emphasize the value of the relationship to your counterpart.`
+            },
+            'low-low-low': {
+                key: 'A↓ B↓ E↓',
+                name: 'Agreeableness LOW + Balance LOW + Exploration LOW',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb5ff6640815e90b869',
+                feedback: `So according to the BRAVE Big 5 measure you completed—and as always, treat this with a huge grain of salt—you might have the following tendencies: You tend to disagree, your Balance is low (meaning you react emotionally more easily), and your Exploration is low.
+
+**What this combination means in conflict:**
+These three tendencies can be challenging in negotiation or conflict situations. Low Agreeableness suggests that if you disagree with someone, you're going to voice it. You're not going to hold back. Low Balance suggests it's relatively easy for you to feel angry, sad, or anxious. And in conflict, these emotional reactions can be valuable if you treat them as signals to yourself. But when they're expressed openly, they can make the conflict more intense—most strongly with anger.
+
+Low Exploration suggests you have a relatively firm view already of what's right and wrong, and you're skeptical about alternative perspectives.
+
+**Here's the combination challenge:**
+If your counterpart perceives you as someone who disagrees often—and maybe not just disagrees but also seems distant, cold, or like you don't care about the relationship—and they think you're low on Exploration (you're not going to change your mind), and you might react emotionally (you might get angry or anxious)—that can be a challenging combination for counterparts.
+
+**Your strategic opportunities:**
+
+**On Agreeableness:** Be tough on the issues—continue to voice your disagreement ("I don't think this is the right way of doing things")—but be friendly to the person. You might have to push yourself and overemphasize the value of the relationship, how you care about the other person, and how maintaining a warm relationship is important to you.
+
+**On Exploration:** Force yourself to consider the other person's perspective. Logically speaking, it cannot be that you are always right and the other people in the room are always wrong, no matter what room you go into. Maybe they have something to say. Maybe there is something in what they're saying that makes sense. And if you really can't do that, at least pretend to listen and be open. Because if your counterpart doesn't perceive you as at least considering their viewpoint, the conflict is not going anywhere anytime soon.
+
+**On Balance:** Distinguish what you feel from what you express. When you feel anger, sadness, or anxiety, treat them as signals to yourself:
+- Anger signals we've reached our limits
+- Sadness suggests we're losing something we value
+- Anxiety warns that something negative might happen
+
+But when you express these emotions (especially anger), that can intensify the conflict. When you feel these emotions coming up, ask for a break. Exit the situation, look at it with distance, refocus on your strategy and what you really want to get out of that conflict, and then enter the conversation again.`
+            },
+            'low-low-high': {
+                key: 'A↓ B↓ E↑',
+                name: 'Agreeableness LOW + Balance LOW + Exploration HIGH',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb5e7e8e499ed284e9d',
+                feedback: `So your tendencies suggest that you are low on Agreeableness, low on Balance, and high on Exploration. This is a really interesting combination, actually.
+
+**What this combination means in conflict:**
+Low Agreeableness indicates you feel free to speak your mind. You observe something you disagree with—how things are done, the order, how your organization prioritizes—and you voice it. Low Balance means you react emotionally more readily—you find it relatively easy to experience anger, sadness, and anxiety in conflict. And high Exploration means you're open to new perspectives. Yes, you have an opinion and yes, you express it freely, but you're also open to changing.
+
+**This is a powerful combination:**
+Low Agreeableness combined with high Exploration in conflict is powerful because your counterparts recognize you have a different opinion from them, but they also know you're open to changing. That is in many ways the kind of person teams want—bringing in a new perspective, going against the grain, challenging the group's collective opinion.
+
+**Your strategic opportunities:**
+
+**On Agreeableness:** Low Agreeableness can mean two things. One: the freedom to express your opinion. Very powerful. But it can also mean others might perceive you as cold, distant, not really caring about the relationship—and therefore not caring about them. In conflict, if I feel like you don't care about me, that's very dangerous. So push yourself: be tough on the issues (continue to disagree on content) but friendly to the person. Build relationships, be warm, emphasize that the relationship matters to you and that they matter to you.
+
+**On Balance:** Distinguish between how you internally experience emotions versus how you express them. When you feel anger, sadness, or anxiety, these are powerful signals:
+- Anger: We've reached our limits
+- Sadness: We're worried about losing something
+- Anxiety: Anticipation of a loss or negative consequence
+
+But if you express these emotions—especially anger—openly toward your counterpart, there's a good chance they'll get angry back at you. They won't think, "Oh yes, he has reached his limits." They'll think, "Typical of this guy. Super disagreeable and gets angry."
+
+When you feel like you're switching from feeling to expressing emotions, take a break. Create distance, go for a walk, clear your head, focus on what really matters to you and what your goal is. Then go back into the conflict with a renewed sense of focus on a good solution, instead of expressing emotions that are likely to increase the conflict.`
+            },
+            'high-high-low': {
+                key: 'A↑ B↑ E↓',
+                name: 'Agreeableness HIGH + Balance HIGH + Exploration LOW',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb4ff6640815e90b84a',
+                feedback: `So you're in a situation of conflict and you're highly agreeable, you have high Balance, and you're low on Exploration.
+
+**What this combination means in conflict:**
+Your high Agreeableness means you value positive relationships—you want to be warm and friendly, to cooperate. Your high Balance means you remain emotionally steady, and you may not feel very angry, sad, or anxious during conflict. But your low Exploration suggests you're relatively set in your ways, you know your preferences and opinions, and you're seen as practical and pragmatic.
+
+**The combination challenge:**
+People might perceive you as nice and emotionally stable, but they might be surprised to discover you're quite firm in your views. You might not disagree with people openly (because you want to get along), but you're not particularly open to changing your mind either. This can create confusion for your counterpart—they think you're agreeable and assume you'll be flexible, but that's not always the case.
+
+**Your strategic opportunities:**
+Be tough on the issues and remain friendly to the person. You're already good at the relationship level—being friendly, polite, and warm. But there's also the content level (should we do this or that? invest here or there?). You might disagree on that content. Try to express that disagreement clearly. If not, the other person might not even realize you disagree with them, which might make you frustrated in the long run because you don't agree with how things are done, but nobody listens or notices.
+
+On your low Exploration, push yourself: even if you think you're right, try to consider the other person's perspective. You might be surprised—you might actually learn something and refine your understanding. And your counterpart will appreciate that you're at least considering their view, which makes them more likely to work toward a solution with you.`
+            },
+            'high-high-high': {
+                key: 'A↑ B↑ E↑',
+                name: 'Agreeableness HIGH + Balance HIGH + Exploration HIGH',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb5e7e8e499ed284ea6',
+                feedback: `So you're in a situation of conflict and you're highly agreeable, you have high Balance, and you're high on Exploration. What a combination.
+
+**What this combination means in conflict:**
+Other people probably love being in conflict with you. They may not even realize this is a conflict because:
+- You're highly agreeable → you value positive relationships, want to be warm and friendly
+- You have high Balance → you remain emotionally steady, rarely getting angry, sad, or anxious during conflict
+- You're high on Exploration → you have an opinion but you're open to alternative perspectives
+
+If I'm your counterpart, I might perceive you as someone who's warm and friendly, super nice, doesn't get angry or upset, and is open to what I'm saying. I mean, what's not to like?
+
+**Here's the tricky thing:**
+Two parts are challenging. One: You might still disagree with that person, but you may not be able to express it because of your high Agreeableness. Two: Coupled with your high Exploration, you should separate the learning phase (where you're listening and considering) from the deciding phase (where you ask yourself, "Has this changed my mind, or do I still think this proposed course of action is wrong?").
+
+**Your strategic opportunities:**
+Try to be tough on the issues or on the content and remain friendly to the person. In conflict situations there's at least two levels: the relationship level (and you're good at being friendly, polite, and warm) and the content level (should we do this first or that first? this way or that way?). You might disagree on content. If you don't express that disagreement, the other person might not even realize—and that might make you upset and frustrated in the long run.
+
+And guess what? People would probably love to hear your disagreement. They might be waiting for you to disagree with them. Your expressions of disagreement will be perceived as particularly valuable and diagnostic because you are already friendly, open to new ideas, and emotionally balanced. When someone like you—who is unlikely to disagree—then expresses disagreement, it might even come as a relief. They'll say, "Oh, finally. Finally, I know what she's thinking."`
+            },
+            'high-low-low': {
+                key: 'A↑ B↓ E↓',
+                name: 'Agreeableness HIGH + Balance LOW + Exploration LOW',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb5e7e8e499ed284e99',
+                feedback: `So you're in a situation of conflict and you're highly agreeable, you have low Balance (you react emotionally often and easily), and you're low on Exploration. This is a very interesting combination.
+
+**What this combination means in conflict:**
+Your high Agreeableness suggests you care deeply about warm and friendly relationships. When you disagree with someone, it takes quite a lot for you to actually express that—you might worry, "If I disagree with them, what will that do to our relationship?"
+
+At the same time, you're likely to react emotionally. You experience and maybe also express anger, sadness, and anxiety during conflict. And your low Exploration suggests you kind of already know what's right and wrong here, and you're not extremely open to new perspectives.
+
+**Here's what makes this combination interesting:**
+Your counterpart probably perceives you as nice and friendly because of your high Agreeableness. But your low Exploration creates a stark contrast. When people think someone is agreeable, they typically also think, "They'll be open to my ideas." But in your case, that may not be true. You might not disagree with people openly because you want to get along with them, but you're still relatively fixed in your views. So it might come as a surprise to your counterpart when you remain firm in your opinion—especially if you also get upset during the interaction.
+
+**Your strategic opportunities:**
+
+**On Agreeableness:** You're already friendly to the other person—that's great. Now learn to be friendly to the person, but tough on the issues. Express your disagreement clearly and firmly with conviction, whilst remaining friendly. The friendly part will come easily to you.
+
+**On Balance:** Distinguish between what you feel and what you express. When you feel these emotions internally, they're valuable signals:
+- Anger signals we've reached our limits
+- Sadness suggests we're losing something we value
+- Anxiety warns that something negative might happen
+
+But if you express anger openly at your counterpart, that's likely to make things worse. When you feel these emotions rising, create some distance—leave the room, go for a walk, think about what you really want to achieve (probably to solve the conflict, not escalate it)—then return with renewed calmness.
+
+**On Exploration:** Even if you think you're right, force yourself to consider the other person's perspective. Two reasons: One, it's unlikely you're right all the time. Two, if your counterpart sees you're not open to other views, they'll find it very difficult to make proposals you'll like. They'll think, "He doesn't listen to me at all. What's the point? Maybe I should just apply brute force." And as you listen—maybe you're just pretending at first—you might actually learn something and refine your understanding.`
+            },
+            'high-low-high': {
+                key: 'A↑ B↓ E↑',
+                name: 'Agreeableness HIGH + Balance LOW + Exploration HIGH',
+                video: 'https://videos.martinschweinsberg.de/watch/6752dbb5ff6640815e90b862',
+                feedback: `So you're in a situation of conflict and you're highly agreeable, you have low Balance (you react emotionally more easily), and you're high on Exploration.
+
+**What this combination means in conflict:**
+Your high Agreeableness means you deeply value warm relationships and getting along with others. Your low Balance means you feel emotions strongly and frequently during conflict—anger, sadness, anxiety. And your high Exploration means you're genuinely open to new perspectives and willing to change your mind.
+
+**The combination challenge:**
+This profile can be challenging because you care deeply about harmony (high Agreeableness) but also feel conflict intensely (low Balance). You might want to avoid disagreement altogether to preserve the relationship, yet the emotional intensity can make avoidance difficult. And your Exploration—while valuable—might sometimes make you question your own positions too much, especially when you're already emotionally activated.
+
+**Your strategic opportunities:**
+
+**On Agreeableness:** Your challenge isn't learning to be friendly—you already are. It's learning to express disagreement while maintaining that friendliness. Practice being tough on the issues, friendly to the person. Your natural warmth is an asset; now pair it with clarity about where you stand on the actual content of the disagreement.
+
+**On Balance:** Your emotions are signals, not directives. When you feel:
+- Anger: You've reached a limit—something feels unfair or too much
+- Sadness: You sense you're losing something you value
+- Anxiety: You're worried about what might happen
+
+Feel these internally as information, but pause before expressing them—especially anger. Take breaks when emotions surge. Your high Exploration means you can reflect on these feelings and use them strategically rather than reactively.
+
+**On Exploration:** Your openness to new perspectives is a strength, but in combination with high Agreeableness, make sure you're not just being agreeable by being open to everything. Separate listening from deciding. Ask yourself: "Have I genuinely changed my mind, or am I just trying to please them?" Your willingness to consider other views is valuable—just make sure it doesn't erase your own perspective.`
+            }
+        };
+
+        const SCENARIOS = {
+            boss: {
+                title: 'The Overly Demanding Boss',
+                description: `You just started in a new company or organization and you're eager to learn as much as possible and to contribute as much as you can to the organization's success. You are excited and ambitious and you've worked really hard to win people's trust and respect.
+
+Now that you have started, you notice that your boss's behavior towards you is increasingly creating challenges and stress. Your boss seems to have good intentions but simply doesn't seem to understand that what she has asked you to do is already enough for a full-time job. She keeps making more and more demands. And so you are struggling to keep up with these demands.
+
+You know, objectively or rationally, you can't keep taking on more and more responsibilities, but you're also struggling to communicate this to your boss. You raised this once in the past and when you indicated that it's becoming too much, your boss seemed to get frustrated and that's it. And so now you have really come to a point where you have to decide.`,
+                questions: [
+                    'Are you bringing this up again, and if so, how?',
+                    'Or are you staying quiet and trying to push through?',
+                    'Or are you going to keep quiet, suffer some more, and look for a new job in the meantime?',
+                    'How does your BRAVE profile (Agreeableness/Balance/Exploration) shape which option feels most natural to you?',
+                    'What would "tough on the issue, friendly to the person" look like here?',
+                    'If you\'re high on Agreeableness, how might you practice speaking up earlier?',
+                    'If you\'re low on Agreeableness, how might you emphasize that you care about your boss\'s goals while setting boundaries?',
+                    'If you have low Balance, what emotions are you feeling? What are they signaling about your limits?',
+                    'What\'s ONE specific thing you\'ll say or do differently next time?'
+                ]
+            },
+            team: {
+                title: 'The Uneven Study Group or Project Team',
+                description: `You've worked in the same study group or project team for months. Deadlines are tight and grades or outcomes are shared, but effort is uneven. Some people are carrying the load while others seem to coast.
+
+From your perspective: you're working late nights, prepping materials, following up on tasks—carrying more than your share. You're frustrated and starting to resent certain team members.
+
+From their perspective: you seem controlling, always checking up on people, micromanaging, not trusting others to do their part. Maybe you're the one creating the tension.
+
+Meetings have grown tense; sarcasm replaces honesty. No one names the problem directly, yet frustration simmers under every interaction. You fear an explosion that could ruin collaboration entirely—or maybe you're quietly hoping someone else will finally say something.`,
+                questions: [
+                    'What\'s really driving this conflict—values, workload, communication styles, or something else?',
+                    'How do your tendencies (Agreeableness/Balance/Exploration) show up in this dynamic? Are you avoiding the conversation, or pushing too hard?',
+                    'If you have low Balance, what emotion are you feeling most (anger/sadness/anxiety)? What is it signaling?',
+                    'If you have low Exploration, might you be missing something about how others see the situation?',
+                    'How might you express concern without criticism or blame?',
+                    'What would a reset conversation sound like—one that\'s honest but doesn\'t destroy trust?',
+                    'What\'s ONE experiment you could try this week to shift the dynamic?'
+                ]
+            },
+            roommate: {
+                title: 'The Roommate Rituals or Close-Quarters Colleague',
+                description: `You share a small apartment with a classmate you genuinely like—or you work in close quarters with a colleague you respect—but daily habits clash. They leave dishes in the sink, or they tidy obsessively and get irritated when you don't, or they blast music when you need quiet to focus, or they want to chat when you need space.
+
+At first it was minor. But annoyances have piled up over weeks or months. What started as quirks now feel like disrespect. You've tried hints and passive notes—nothing changes. You don't want open confrontation or tension, yet resentment is building and you can feel it affecting the relationship.
+
+You realize: this is low-stakes practice for workplace friction. How you handle this will shape how you handle similar situations when the stakes are higher—with bosses, clients, or team members you can't avoid.`,
+                questions: [
+                    'What does this conflict reveal about your own values, boundaries, and triggers?',
+                    'What emotion shows up most for you (anger/sadness/anxiety)? What does it signal about what you value or fear losing?',
+                    'How does your BRAVE profile (Agreeableness/Balance/Exploration) shape your default reaction? Are you staying silent to preserve harmony? Getting quietly angry? Avoiding the person?',
+                    'If you\'re high on Agreeableness, what\'s stopping you from speaking up? What would it take?',
+                    'If you\'re low on Agreeableness, have you already brought it up in a way that felt harsh or cold? How might you try again with more warmth?',
+                    'How might you raise the issue without blame—describing the impact on you rather than judging their behavior?',
+                    'What experiment could you try this week to test a better pattern—a direct but kind conversation, a new routine, a shared agreement?'
+                ]
+            }
+        };
+
+        class WorkshopState {
+            constructor() {
+                this.loadState();
+            }
+
+            loadState() {
+                const saved = localStorage.getItem('braveWorkshopState');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(this, parsed);
+                } else {
+                    this.reset();
+                }
+            }
+
+            saveState() {
+                localStorage.setItem('braveWorkshopState', JSON.stringify(this));
+            }
+
+            reset() {
+                this.step = 'welcome';
+                this.studentName = '';
+                this.profile = null;
+                this.responses = {
+                    step1: '',
+                    step2_helps: '',
+                    step2_holds: '',
+                    step3: '',
+                    scenario: null,
+                    scenarioResponse: '',
+                    commitment: '',
+                    closing: ''
+                };
+                this.chatHistory = [];
+                this.saveState();
+            }
+
+            addMessage(type, content) {
+                this.chatHistory.push({ type, content, timestamp: Date.now() });
+                this.saveState();
+            }
+
+            setProfile(agreeableness, balance, exploration) {
+                const key = `${agreeableness}-${balance}-${exploration}`;
+                this.profile = PROFILES[key];
+                this.saveState();
+            }
+
+            getProfileString() {
+                if (!this.profile) return '';
+                const parts = this.profile.key.split(' ');
+                return `Agreeableness:${parts[0].includes('↑') ? 'High' : 'Low'}, Balance:${parts[1].includes('↑') ? 'High' : 'Low'}, Exploration:${parts[2].includes('↑') ? 'High' : 'Low'}`;
+            }
+        }
+
+        // ======================
+        // UI MANAGEMENT
+        // ======================
+
+        class WorkshopUI {
+            constructor() {
+                this.state = new WorkshopState();
+                this.chatContainer = document.getElementById('chatContainer');
+                this.inputArea = document.getElementById('inputArea');
+                this.progressIndicator = document.getElementById('progressIndicator');
+                
+                this.init();
+            }
+
+            init() {
+                this.renderChatHistory();
+                this.renderCurrentStep();
+                this.scrollToBottom();
+            }
+
+            renderChatHistory() {
+                this.chatContainer.innerHTML = '';
+                this.state.chatHistory.forEach(msg => {
+                    this.addMessageToDOM(msg.type, msg.content);
+                });
+            }
+
+            addMessageToDOM(type, content) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${type}`;
+                msgDiv.innerHTML = content;
+                this.chatContainer.appendChild(msgDiv);
+            }
+
+            addMessage(type, content) {
+                this.state.addMessage(type, content);
+                this.addMessageToDOM(type, content);
+                this.scrollToBottom();
+            }
+
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+                }, 100);
+            }
+
+            updateProgress(text) {
+                this.progressIndicator.textContent = text;
+            }
+
+            renderCurrentStep() {
+                this.inputArea.innerHTML = '';
+                
+                switch(this.state.step) {
+                    case 'welcome':
+                        this.renderWelcome();
+                        break;
+                    case 'get-name':
+                        this.renderGetName();
+                        break;
+                    case 'get-scores':
+                        this.renderGetScores();
+                        break;
+                    case 'show-profile':
+                        this.renderShowProfile();
+                        break;
+                    case 'step1':
+                        this.renderStep1();
+                        break;
+                    case 'peer-coaching-1':
+                        this.renderPeerCoaching1();
+                        break;
+                    case 'step2':
+                        this.renderStep2();
+                        break;
+                    case 'peer-coaching-2':
+                        this.renderPeerCoaching2();
+                        break;
+                    case 'step3':
+                        this.renderStep3();
+                        break;
+                    case 'step4-intro':
+                        this.renderStep4Intro();
+                        break;
+                    case 'step4-scenario-select':
+                        this.renderStep4ScenarioSelect();
+                        break;
+                    case 'step4-reflection':
+                        this.renderStep4Reflection();
+                        break;
+                    case 'step4-commitment':
+                        this.renderStep4Commitment();
+                        break;
+                    case 'profile-card':
+                        this.renderProfileCard();
+                        break;
+                    case 'surveys':
+                        this.renderSurveys();
+                        break;
+                    case 'closing':
+                        this.renderClosing();
+                        break;
+                    case 'complete':
+                        this.renderComplete();
+                        break;
+                }
+            }
+
+            renderWelcome() {
+                this.updateProgress('Welcome');
+                this.addMessage('bot', `
+                    <h2>🧭 THE CONFLICT COMPETENCE BUILDER (BRAVE MODEL)</h2>
+                    <p>Map your conflict style. Help a peer succeed.</p>
+                    <p><em>Developed by Dr. Martin Schweinsberg (ESMT Berlin)</em></p>
+                    
+                    <p>This exercise builds on Martin's framework <strong>The Psychology of Everything</strong>: the idea that <strong>Behavior = Person × Situation × Construal</strong></p>
+                    
+                    <p>In this lab you will:</p>
+                    <p>1️⃣ Map your personal conflict style<br>
+                    2️⃣ Coach a peer to succeed, learning as much from guiding as from being guided</p>
+                    
+                    <p>Each person will experience both roles: coach and client. By the end, you'll understand your own tendencies and know how to help others handle tension constructively.</p>
+                `);
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'START WORKSHOP';
+                btn.onclick = () => {
+                    this.state.step = 'get-name';
+                    this.state.saveState();
+                    this.renderCurrentStep();
+                };
+                this.inputArea.appendChild(btn);
+            }
+
+            renderGetName() {
+                this.updateProgress('Getting Started');
+                this.addMessage('bot', `
+                    <p>Welcome! Before we begin, what's your first name?</p>
+                    <p><em>(This helps personalize your experience. Your data stays in your browser only.)</em></p>
+                `);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Enter your first name';
+                input.id = 'nameInput';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'CONTINUE';
+                btn.onclick = () => {
+                    const name = document.getElementById('nameInput').value.trim();
+                    if (name) {
+                        this.state.studentName = name;
+                        this.state.step = 'get-scores';
+                        this.state.saveState();
+                        this.addMessage('user', name);
+                        this.renderCurrentStep();
+                    } else {
+                        alert('Please enter your name to continue.');
+                    }
+                };
+                
+                this.inputArea.appendChild(input);
+                this.inputArea.appendChild(btn);
+                setTimeout(() => input.focus(), 100);
+            }
+
+            renderGetScores() {
+                this.updateProgress('Step 0: Get Your BRAVE Big 5 Results');
+                this.addMessage('bot', `
+                    <h3>🧭 STEP 0: Get Your BRAVE Big 5 Results (5 min)</h3>
+                    
+                    <p>Hi ${this.state.studentName}! Before we begin, you'll need your three key personality scores from the BRAVE Big 5:</p>
+                    <p><strong>Agreeableness, Balance, and Exploration</strong></p>
+                    
+                    <h4>You have two options:</h4>
+                    
+                    <p><strong>Option 1: If you already completed the test</strong><br>
+                    Open your BRAVE Big 5 results email and note whether each trait is High (↑) or Low (↓).</p>
+                    
+                    <p><strong>Option 2: If you haven't taken it yet (≈ 2 minutes)</strong><br>
+                    Take the BRAVE Big 5 (TIPI) here → <a href="https://go.martinschweinsberg.de/briefbig5" target="_blank" style="color: #667eea; font-weight: 600;">https://go.martinschweinsberg.de/briefbig5</a><br>
+                    Answer honestly and quickly: it's intentionally short.</p>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+                    
+                    <h4>🧩 What These Traits Mean</h4>
+                    
+                    <p><strong>Agreeableness</strong> describes how much you value warm, friendly relationships and getting along with others. High Agreeableness means you prioritize harmony; low Agreeableness means you feel free to speak your mind even when it creates tension.</p>
+                    
+                    <p><strong>Balance</strong> describes your emotional stability in challenging situations. High Balance means you remain calm and steady even under pressure; low Balance means you react emotionally more quickly and intensely to events around you.</p>
+                    
+                    <p><strong>Exploration</strong> describes your openness to new perspectives and experiences. High Exploration means you're comfortable with ambiguity and enjoy considering alternative viewpoints; low Exploration means you have clear convictions and prefer practical, proven approaches.</p>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+                    
+                    <h4>⚠️ Important Note on Terminology</h4>
+                    <p>The BRAVE Big 5 uses slightly different names than some other personality tests:</p>
+                    <ul>
+                        <li><strong>Balance</strong> (in BRAVE) = <strong>Emotional Reactions</strong> (in some videos/tests)
+                            <ul>
+                                <li>High Balance = Low Emotional Reactions</li>
+                                <li>Low Balance = High Emotional Reactions</li>
+                            </ul>
+                        </li>
+                        <li><strong>Exploration</strong> (in BRAVE) = <strong>Openness</strong> or <strong>Openness to Experience</strong> (in some videos/tests)</li>
+                        <li><strong>Agreeableness</strong> = same in both</li>
+                    </ul>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+                    
+                    <p><strong>When you have your three scores ready, share them with me in exactly this format:</strong></p>
+                    <p style="background: #f0f4f8; padding: 15px; border-radius: 8px; font-family: monospace;">
+                    Agreeableness:[High/Low], Balance:[High/Low], Exploration:[High/Low]
+                    </p>
+                    <p><strong>Example:</strong> Agreeableness:Low, Balance:High, Exploration:Low</p>
+                `);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Agreeableness:Low, Balance:High, Exploration:Low';
+                input.id = 'scoresInput';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'SUBMIT SCORES';
+                btn.onclick = () => this.handleScoresSubmission();
+                
+                this.inputArea.appendChild(input);
+                this.inputArea.appendChild(btn);
+                setTimeout(() => input.focus(), 100);
+            }
+
+            handleScoresSubmission() {
+                const input = document.getElementById('scoresInput').value.trim();
+                
+                // Parse the input
+                const pattern = /Agreeableness:(High|Low),?\s*Balance:(High|Low),?\s*Exploration:(High|Low)/i;
+                const match = input.match(pattern);
+                
+                if (!match) {
+                    alert('Please enter your scores in the correct format:\nAgreeableness:[High/Low], Balance:[High/Low], Exploration:[High/Low]');
+                    return;
+                }
+                
+                const agreeableness = match[1].toLowerCase();
+                const balance = match[2].toLowerCase();
+                const exploration = match[3].toLowerCase();
+                
+                this.state.setProfile(agreeableness, balance, exploration);
+                this.state.step = 'show-profile';
+                this.state.saveState();
+                this.addMessage('user', input);
+                this.renderCurrentStep();
+            }
+
+            renderShowProfile() {
+                this.updateProgress('Your Profile Feedback');
+                
+                const profile = this.state.profile;
+                const profileStr = this.state.getProfileString();
+                
+                this.addMessage('bot', `
+                    <div class="profile-badge">Your Profile: ${profileStr}</div>
+                    
+                    <h3>🎥 DR. SCHWEINSBERG'S VIDEO FEEDBACK FOR YOUR PROFILE</h3>
+                    <p><em>The insights below come directly from video feedback Dr. Schweinsberg recorded for your specific personality combination. This is Martin's expertise and research, not generic AI advice.</em></p>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+                    
+                    <h4>Profile ${profile.key}: ${profile.name}</h4>
+                    
+                    ${profile.feedback.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('')}
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+                    
+                    <h4>🎥 Want to Watch Dr. Schweinsberg's Full Video?</h4>
+                    <p>If you'd like to watch Martin explain your profile in his own words (3–4 min):</p>
+                    <p><a href="${profile.video}" target="_blank" class="survey-link" style="display: inline-block; padding: 10px 20px; margin: 10px 0;">Watch Your Profile Video</a></p>
+                    
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+                    
+                    <p><strong>When you're ready to reflect on your style, type READY below.</strong></p>
+                `);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Type READY when you\'re ready to continue';
+                input.id = 'readyInput';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'CONTINUE';
+                btn.onclick = () => {
+                    const val = document.getElementById('readyInput').value.trim().toUpperCase();
+                    if (val === 'READY') {
+                        this.state.step = 'step1';
+                        this.state.saveState();
+                        this.addMessage('user', 'READY');
+                        this.renderCurrentStep();
+                    } else {
+                        alert('Please type READY to continue');
+                    }
+                };
+                
+                this.inputArea.appendChild(input);
+                this.inputArea.appendChild(btn);
+                setTimeout(() => input.focus(), 100);
+            }
+
+            renderStep1() {
+                this.updateProgress('Step 1: Describe Your Conflict Style');
+                
+                const profileStr = this.state.getProfileString();
+                
+                this.addMessage('bot', `
+                    <h3>🪞 STEP 1: Describe Your Conflict Style (10 min)</h3>
+                    
+                    <div class="profile-badge">Your profile: ${profileStr}</div>
+                    
+                    <p>Now that you understand your tendencies, let's get specific about YOUR conflict style.</p>
+                    
+                    <p><strong>Considering Martin's feedback above:</strong></p>
+                    <ul>
+                        <li>What IS your approach to conflict resolution?</li>
+                        <li>How do your specific tendencies (Agreeableness, Balance, Exploration) play into this?</li>
+                    </ul>
+                    
+                    <p>Write 3–5 sentences describing your natural pattern.</p>
+                `);
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'Describe your natural conflict style in 3-5 sentences...';
+                textarea.id = 'step1Input';
+                textarea.value = this.state.responses.step1;
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'SUBMIT';
+                btn.onclick = () => {
+                    const response = document.getElementById('step1Input').value.trim();
+                    if (response.length < 50) {
+                        alert('Please write at least 3-5 sentences (50+ characters)');
+                        return;
+                    }
+                    this.state.responses.step1 = response;
+                    this.state.step = 'peer-coaching-1';
+                    this.state.saveState();
+                    this.addMessage('user', response);
+                    
+                    // Provide micro-feedback
+                    this.addMessage('bot', `
+                        <div class="profile-badge">Your profile: ${profileStr}</div>
+                        
+                        <p>Thank you for sharing, ${this.state.studentName}. I can see how your ${profileStr.split(',')[0].split(':')[1]} Agreeableness and ${profileStr.split(',')[1].split(':')[1]} Balance shape your approach. Your description shows self-awareness about your natural patterns.</p>
+                        
+                        <p><strong>One observation:</strong> Notice how your tendencies create both strengths and potential blind spots in how you navigate disagreement.</p>
+                        
+                        <p><strong>Clarifying question:</strong> When you encounter conflict, what usually happens first—do you feel it in your body, think about it strategically, or notice the impact on the relationship?</p>
+                        
+                        <p><em>(Take a moment to reflect on this, then continue when ready.)</em></p>
+                    `);
+                    
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(textarea);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderPeerCoaching1() {
+                this.updateProgress('Peer Coaching Round 1');
+                
+                this.addMessage('bot', `
+                    <h3>🗣 PEER COACHING ROUND 1: Exploring Conflict Style (15 min)</h3>
+                    
+                    <p>Time to work with your partner. This is collaborative learning.</p>
+                    
+                    <p><strong>Roles:</strong> Partner A = Coach | Partner B = Client (then switch after 7 minutes)</p>
+                    
+                    <p><strong>⏱ Students: Start a 7-minute timer on your phone now.</strong></p>
+                    
+                    <h4>Coach's Job:</h4>
+                    <p>You're not in the ring—you're cheering from the sidelines. Your job is to help your partner see their pattern more clearly.</p>
+                    
+                    <p>Ask your partner:</p>
+                    <ul>
+                        <li>"What stands out most about your conflict style?"</li>
+                        <li>"Can you give me an example of when this pattern showed up recently?"</li>
+                        <li>"When does this approach help you? When does it make things harder?"</li>
+                        <li>"What's one strength in your style you could lean on more?"</li>
+                    </ul>
+                    
+                    <h4>Client's Job:</h4>
+                    <p>Answer honestly. Notice what becomes clearer as you explain it to someone else.</p>
+                    
+                    <h4>Both people:</h4>
+                    <p>Take notes on insights that emerge. You'll use these in the next step.</p>
+                    
+                    <p><strong>⏱ After both of you have coached once (15 min total), return here and type READY.</strong></p>
+                `);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Type READY after completing peer coaching';
+                input.id = 'readyInput';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'CONTINUE';
+                btn.onclick = () => {
+                    const val = document.getElementById('readyInput').value.trim().toUpperCase();
+                    if (val === 'READY') {
+                        this.state.step = 'step2';
+                        this.state.saveState();
+                        this.addMessage('user', 'READY');
+                        this.renderCurrentStep();
+                    } else {
+                        alert('Please type READY to continue');
+                    }
+                };
+                
+                this.inputArea.appendChild(input);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderStep2() {
+                this.updateProgress('Step 2: When to Be Yourself / When to Push');
+                
+                const profileStr = this.state.getProfileString();
+                
+                this.addMessage('bot', `
+                    <h3>⚖️ STEP 2: When to Be Yourself / When to Push (10 min)</h3>
+                    
+                    <div class="profile-badge">Your profile: ${profileStr}</div>
+                    
+                    <p>Back with me (the AI) now. Reflect on what came up in your partner conversation.</p>
+                    
+                    <h4>1. When do your tendencies HELP you in conflict?</h4>
+                    <p><em>(When can you just be natural?)</em></p>
+                `);
+                
+                const textarea1 = document.createElement('textarea');
+                textarea1.placeholder = 'When do your tendencies help you?';
+                textarea1.id = 'helpsInput';
+                textarea1.value = this.state.responses.step2_helps;
+                textarea1.style.minHeight = '80px';
+                
+                this.inputArea.appendChild(textarea1);
+                
+                this.addMessage('bot', `
+                    <h4>2. When do your tendencies HOLD YOU BACK?</h4>
+                    <p><em>(When do you need to push yourself?)</em></p>
+                    
+                    <p>Examples:</p>
+                    <ul>
+                        <li>High Agreeableness → might need to voice disagreement earlier, even if uncomfortable</li>
+                        <li>Low Agreeableness → might need to pause and choose battles, emphasize relationship warmth</li>
+                        <li>Low Balance → might need to create distance before expressing emotions</li>
+                        <li>Low Exploration → might need to force consideration of alternative views</li>
+                    </ul>
+                `);
+                
+                const textarea2 = document.createElement('textarea');
+                textarea2.placeholder = 'When do your tendencies hold you back?';
+                textarea2.id = 'holdsInput';
+                textarea2.value = this.state.responses.step2_holds;
+                textarea2.style.minHeight = '80px';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'SUBMIT';
+                btn.onclick = () => {
+                    const helps = document.getElementById('helpsInput').value.trim();
+                    const holds = document.getElementById('holdsInput').value.trim();
+                    
+                    if (helps.length < 20 || holds.length < 20) {
+                        alert('Please provide thoughtful responses for both questions');
+                        return;
+                    }
+                    
+                    this.state.responses.step2_helps = helps;
+                    this.state.responses.step2_holds = holds;
+                    this.state.step = 'peer-coaching-2';
+                    this.state.saveState();
+                    this.addMessage('user', `<strong>When my tendencies help:</strong><br>${helps}<br><br><strong>When they hold me back:</strong><br>${holds}`);
+                    
+                    // Provide micro-feedback
+                    this.addMessage('bot', `
+                        <div class="profile-badge">Your profile: ${profileStr}</div>
+                        
+                        <p>Excellent reflection, ${this.state.studentName}. I can see the core tension in your pattern: you recognize both the value and the limitations of your natural approach.</p>
+                        
+                        <p><strong>One strategic adjustment:</strong> The key is noticing WHEN you're in a situation that calls for your natural strengths versus when you need to deliberately shift. That awareness is half the battle.</p>
+                        
+                        <p>Ready for the final coaching round to turn this insight into action.</p>
+                    `);
+                    
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(textarea2);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderPeerCoaching2() {
+                this.updateProgress('Peer Coaching Round 2');
+                
+                this.addMessage('bot', `
+                    <h3>🗣 PEER COACHING ROUND 2: Turning Insight into Action (15 min)</h3>
+                    
+                    <p>Final coaching round—let's make this concrete.</p>
+                    
+                    <p><strong>Roles:</strong> Partner A = Coach | Partner B = Client (then switch after 7 minutes)</p>
+                    
+                    <p><strong>⏱ Students: Start a 7-minute timer on your phone now.</strong></p>
+                    
+                    <h4>Coach's Questions:</h4>
+                    <ul>
+                        <li>"Looking at when your style helps vs. holds you back—what's the pattern you see?"</li>
+                        <li>"What's ONE thing you could experiment with in your next conflict?"</li>
+                        <li>"How will you know if that experiment worked?"</li>
+                        <li>"What might get in your way? How will you handle that?"</li>
+                    </ul>
+                    
+                    <h4>Client's Job:</h4>
+                    <p>Get specific. Move from insight to action. Your coach is here to help you commit to something real.</p>
+                    
+                    <p><strong>⏱ After both of you have coached (15 min total), return here and type READY.</strong></p>
+                `);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Type READY after completing peer coaching';
+                input.id = 'readyInput';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'CONTINUE';
+                btn.onclick = () => {
+                    const val = document.getElementById('readyInput').value.trim().toUpperCase();
+                    if (val === 'READY') {
+                        this.state.step = 'step3';
+                        this.state.saveState();
+                        this.addMessage('user', 'READY');
+                        this.renderCurrentStep();
+                    } else {
+                        alert('Please type READY to continue');
+                    }
+                };
+                
+                this.inputArea.appendChild(input);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderStep3() {
+                this.updateProgress('Step 3: What to Pay Attention To');
+                
+                const profileStr = this.state.getProfileString();
+                
+                this.addMessage('bot', `
+                    <h3>👀 STEP 3: What to Pay Attention To (5 min)</h3>
+                    
+                    <div class="profile-badge">Your profile: ${profileStr}</div>
+                    
+                    <p>Individual reflection before we apply this to real scenarios.</p>
+                    
+                    <p><strong>What are 1–2 things you want to pay attention to in future conflicts?</strong></p>
+                    
+                    <p>This could be:</p>
+                    <ul>
+                        <li>A technique from Martin's profile feedback</li>
+                        <li>Something your peer coach helped you see</li>
+                        <li>A behavior you want to experiment with</li>
+                        <li>A pattern you want to interrupt</li>
+                    </ul>
+                    
+                    <p>List 1–2 micro-commitments.</p>
+                `);
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'List 1-2 things you want to pay attention to...';
+                textarea.id = 'step3Input';
+                textarea.value = this.state.responses.step3;
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'SUBMIT';
+                btn.onclick = () => {
+                    const response = document.getElementById('step3Input').value.trim();
+                    if (response.length < 20) {
+                        alert('Please provide at least 1-2 specific commitments');
+                        return;
+                    }
+                    
+                    this.state.responses.step3 = response;
+                    this.state.step = 'step4-intro';
+                    this.state.saveState();
+                    this.addMessage('user', response);
+                    
+                    // Provide micro-feedback
+                    this.addMessage('bot', `
+                        <div class="profile-badge">Your profile: ${profileStr}</div>
+                        
+                        <p>Strong commitments, ${this.state.studentName}. These are specific enough to actually notice and act on. Your commitments connect directly to your profile's key challenges and opportunities.</p>
+                        
+                        <p>Now let's apply your insights to a real leadership challenge.</p>
+                    `);
+                    
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(textarea);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderStep4Intro() {
+                this.updateProgress('Step 4: Leadership Challenge');
+                
+                this.addMessage('bot', `
+                    <h3>🚀 STEP 4: Apply Your Insights to One Challenging Leadership Situation 💡</h3>
+                    
+                    <p><strong>Instructions for the person leading the conversation / helping their peer:</strong></p>
+                    <p>Let your peer choose one of the following three leadership situations and challenges.</p>
+                    
+                    <p>Ask your peer which of these three scenarios they are most attracted to. Maybe it challenges them, or they know they would struggle in this kind of situation, or they could see themselves handling such a situation well, or maybe they experienced such a situation in the past and they want to get a better understanding of what made them behave a certain way back then.</p>
+                    
+                    <p>Once they've chosen, guide them through reflecting on:</p>
+                    <ol>
+                        <li>How does their conflict style (Agreeableness/Balance/Exploration) shape their default response?</li>
+                        <li>What would they normally do?</li>
+                        <li>What's ONE thing they'll do differently based on what they learned today?</li>
+                    </ol>
+                    
+                    <p><strong>Choose one of the three scenarios to reflect on.</strong></p>
+                `);
+                
+                this.state.step = 'step4-scenario-select';
+                this.state.saveState();
+                this.renderCurrentStep();
+            }
+
+            renderStep4ScenarioSelect() {
+                this.updateProgress('Step 4: Choose Scenario');
+                
+                Object.entries(SCENARIOS).forEach(([key, scenario]) => {
+                    const card = document.createElement('div');
+                    card.className = 'scenario-card';
+                    if (this.state.responses.scenario === key) {
+                        card.classList.add('selected');
+                    }
+                    card.innerHTML = `
+                        <h3>⚔️ ${scenario.title}</h3>
+                        <p>${scenario.description.substring(0, 200)}...</p>
+                    `;
+                    card.onclick = () => {
+                        this.state.responses.scenario = key;
+                        this.state.step = 'step4-reflection';
+                        this.state.saveState();
+                        this.addMessage('user', `Selected: ${scenario.title}`);
+                        this.renderCurrentStep();
+                    };
+                    this.inputArea.appendChild(card);
+                });
+            }
+
+            renderStep4Reflection() {
+                this.updateProgress('Step 4: Reflect on Scenario');
+                
+                const scenario = SCENARIOS[this.state.responses.scenario];
+                
+                this.addMessage('bot', `
+                    <h3>⚔️ ${scenario.title}</h3>
+                    
+                    <p>${scenario.description}</p>
+                    
+                    <h4>Consider the following questions:</h4>
+                    <p><em>(You don't need to answer all of them, just pick the ones that resonate most with you)</em></p>
+                    <ul>
+                        ${scenario.questions.map(q => `<li>${q}</li>`).join('')}
+                    </ul>
+                    
+                    <p><strong>Reflect on this scenario and how your BRAVE profile shapes your approach:</strong></p>
+                `);
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'Write your reflection on this scenario...';
+                textarea.id = 'scenarioInput';
+                textarea.value = this.state.responses.scenarioResponse;
+                textarea.style.minHeight = '120px';
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'SUBMIT REFLECTION';
+                btn.onclick = () => {
+                    const response = document.getElementById('scenarioInput').value.trim();
+                    if (response.length < 50) {
+                        alert('Please write a thoughtful reflection (at least 50 characters)');
+                        return;
+                    }
+                    
+                    this.state.responses.scenarioResponse = response;
+                    this.state.step = 'step4-commitment';
+                    this.state.saveState();
+                    this.addMessage('user', response);
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(textarea);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderStep4Commitment() {
+                this.updateProgress('Step 4: Your Commitment');
+                
+                this.addMessage('bot', `
+                    <h3>💬 Coach's Closing Questions for Step 4</h3>
+                    
+                    <p>After reflecting on your chosen scenario, consider:</p>
+                    <ul>
+                        <li>"How could your tendencies help or hinder you in this situation?"</li>
+                        <li>"Is your default reaction the ideal one here, or is there something you'd like to adjust?"</li>
+                        <li>"What's ONE specific thing you'll try differently next time you face this kind of challenge?"</li>
+                    </ul>
+                    
+                    <p><strong>Summarize your commitment:</strong></p>
+                    <p>"What I'll do differently in my next conflict is …"</p>
+                `);
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'What I\'ll do differently in my next conflict is...';
+                textarea.id = 'commitmentInput';
+                textarea.value = this.state.responses.commitment;
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'SUBMIT COMMITMENT';
+                btn.onclick = async () => {
+                    const response = document.getElementById('commitmentInput').value.trim();
+                    if (response.length < 20) {
+                        alert('Please write a specific commitment');
+                        return;
+                    }
+
+                    this.state.responses.commitment = response;
+                    this.state.step = 'profile-card';
+                    this.state.saveState();
+                    this.addMessage('user', response);
+
+                    // Affirm concrete commitment
+                    this.addMessage('bot', `
+                        <p>Excellent commitment, ${this.state.studentName}. That's concrete and actionable. The key now is to actually try it in your next conflict situation and notice what happens.</p>
+                    `);
+
+                    // Send milestone data to webhook (Step 4 completion)
+                    await this.submitToWebhook('step4_completed');
+
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(textarea);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderProfileCard() {
+                this.updateProgress('Your Profile Card');
+                
+                const profileStr = this.state.getProfileString();
+                
+                this.addMessage('bot', `
+                    <h3>🧭 YOUR CONFLICT STYLE PROFILE CARD</h3>
+                    
+                    <div style="background: #f0f4f8; padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+                        <p><strong>My BRAVE Profile:</strong> ${profileStr}</p>
+                        
+                        <p><strong>My Style in One Sentence:</strong><br>
+                        ${this.state.responses.step1.substring(0, 200)}...</p>
+                        
+                        <p><strong>When I Can Be Myself:</strong><br>
+                        ${this.state.responses.step2_helps}</p>
+                        
+                        <p><strong>When I Need to Push Myself:</strong><br>
+                        ${this.state.responses.step2_holds}</p>
+                        
+                        <p><strong>What I'll Pay Attention To:</strong><br>
+                        ${this.state.responses.step3}</p>
+                        
+                        <p><strong>My One Concrete Action:</strong><br>
+                        ${this.state.responses.commitment}</p>
+                    </div>
+                    
+                    <p style="margin-top: 20px;"><em>Save this card! You can screenshot it or copy the text for your records.</em></p>
+                `);
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'CONTINUE TO SURVEYS';
+                btn.onclick = () => {
+                    this.state.step = 'surveys';
+                    this.state.saveState();
+                    this.addMessage('user', 'Continue');
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(btn);
+            }
+
+            renderSurveys() {
+                this.updateProgress('Submit Your Reflection (Optional)');
+                
+                this.addMessage('bot', `
+                    <div class="survey-box">
+                        <h3>📤 SAVE TIME ON YOUR ASSIGNMENT: SUBMIT YOUR REFLECTION</h3>
+                        
+                        <p><strong>Here's how this helps you:</strong></p>
+                        <p>If you submit your reflection through the survey below, you've essentially completed a significant portion of your assignment for this course. You'll still need to upload something later, but completing this survey now will save you substantial time.</p>
+                        
+                        <p style="margin-top: 20px;"><strong>Personal Reflection Survey</strong><br>
+                        Share your insights from today's exercise. This becomes the foundation of your assignment.</p>
+                        <a href="https://go.martinschweinsberg.de/personal" class="survey-link" target="_blank">→ Submit Personal Reflection</a>
+                        
+                        <p style="margin-top: 20px; font-weight: 600; color: #b8860b;">Completing this survey now = less work later. It's worth the 5 minutes.</p>
+                    </div>
+                `);
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'CONTINUE TO CLOSING';
+                btn.onclick = () => {
+                    this.state.step = 'closing';
+                    this.state.saveState();
+                    this.addMessage('user', 'Continue');
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(btn);
+            }
+
+            renderClosing() {
+                this.updateProgress('Closing Reflection');
+                
+                this.addMessage('bot', `
+                    <h3>🎯 Closing Reflection</h3>
+                    
+                    <p>Before we finish:</p>
+                    <ul>
+                        <li>What surprised you most about your conflict pattern today?</li>
+                        <li>What's ONE thing you'll experiment with in your next disagreement?</li>
+                    </ul>
+                `);
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'Share your closing thoughts...';
+                textarea.id = 'closingInput';
+                textarea.value = this.state.responses.closing;
+                
+                const btn = document.createElement('button');
+                btn.textContent = 'FINISH WORKSHOP';
+                btn.onclick = async () => {
+                    const response = document.getElementById('closingInput').value.trim();
+                    if (response.length < 10) {
+                        alert('Please share a brief closing thought');
+                        return;
+                    }
+
+                    this.state.responses.closing = response;
+                    this.state.step = 'complete';
+                    this.state.saveState();
+                    this.addMessage('user', response);
+
+                    // Send workshop completion data to webhook
+                    await this.submitToWebhook();
+
+                    this.renderCurrentStep();
+                };
+                
+                this.inputArea.appendChild(textarea);
+                this.inputArea.appendChild(btn);
+            }
+
+            renderComplete() {
+                this.updateProgress('Workshop Complete! ✅');
+                
+                this.addMessage('bot', `
+                    <h2 style="text-align: center; color: #667eea;">🎉 Workshop Complete!</h2>
+                    
+                    <p><strong>Well done, ${this.state.studentName}.</strong> You've mapped your natural conflict style using the BRAVE framework and practiced coaching a peer. These patterns won't change overnight—but now you know what to pay attention to. That's where growth starts.</p>
+                    
+                    <p><strong>Your Profile Card:</strong> Scroll up to review and save your profile card.</p>
+                    
+                    <p><strong>Next Steps:</strong></p>
+                    <ul>
+                        <li>Try your ONE concrete action in your next conflict</li>
+                        <li>Notice what happens when you pay attention to your tendencies</li>
+                        <li>Complete the reflection survey if you haven't already</li>
+                        <li>Share insights with your study group</li>
+                    </ul>
+                    
+                    <p style="margin-top: 30px; text-align: center; color: #666;">
+                        <em>Your progress has been saved. You can close this page anytime.</em>
+                    </p>
+                `);
+                
+                const resetBtn = document.createElement('button');
+                resetBtn.textContent = 'START NEW WORKSHOP';
+                resetBtn.className = 'reset-button';
+                resetBtn.onclick = () => {
+                    if (confirm('Are you sure you want to start a new workshop? This will erase all your current progress.')) {
+                        this.state.reset();
+                        location.reload();
+                    }
+                };
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'DOWNLOAD MY DATA';
+                downloadBtn.onclick = () => this.downloadData();
+                
+                this.inputArea.appendChild(downloadBtn);
+                this.inputArea.appendChild(resetBtn);
+            }
+
+            async submitToWebhook(milestone = 'completed') {
+                // Prepare data payload with all user responses
+                const data = {
+                    studentName: this.state.studentName,
+                    profile: this.state.getProfileString(),
+                    profileKey: this.state.profile ? this.state.profile.key : '',
+                    responses: this.state.responses,
+                    milestone: milestone,
+                    currentStep: this.state.step,
+                    completedDate: new Date().toISOString(),
+                    timestamp: Date.now()
                 };
 
-                // Start workshop
-                startWorkshop();
+                // Send to Make.com webhook
+                console.log(`Sending workshop data to webhook (${milestone})...`);
+                const result = await sendToWebhook(data);
 
-            } catch (error) {
-                console.error('Session lookup error:', error);
-                showError('lookupError', error.message || 'Could not find your session. Please check your email and try again.');
-                btn.disabled = false;
-                btn.textContent = 'Continue to Workshop';
+                if (result.success === false) {
+                    console.error('Failed to send data to webhook:', result.error);
+                    // Continue anyway - don't block user from completing workshop
+                } else {
+                    console.log('Successfully sent data to webhook');
+                }
+            }
+
+            downloadData() {
+                const data = {
+                    studentName: this.state.studentName,
+                    profile: this.state.getProfileString(),
+                    responses: this.state.responses,
+                    completedDate: new Date().toISOString()
+                };
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `brave-workshop-${this.state.studentName}-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
             }
         }
 
-        function startWorkshop() {
-            updateProgress('Step 1: Describe Your Conflict Style');
-            showStep('step1');
-            
-            addMessage('step1Messages', 'bot', `
-                <h3>Welcome, ${sessionData.student_name}!</h3>
-                <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
-                <p>Now that you understand your tendencies, let's get specific about YOUR conflict style.</p>
-                <p><strong>What IS your approach to conflict resolution?</strong></p>
-                <p>How do your specific tendencies (Agreeableness, Balance, Exploration) play into this?</p>
-                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Write 3–5 sentences describing your natural pattern.</p>
-            `);
-        }
-
-        // Step 1: Conflict Style
-        async function submitStep1() {
-            const response = document.getElementById('step1Input').value.trim();
-            
-            if (response.length < 50) {
-                showError('step1Error', 'Please write at least 50 characters (3-5 sentences)');
-                return;
-            }
-
-            clearError('step1Error');
-            const btn = document.getElementById('step1Btn');
-            btn.disabled = true;
-            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
-
-            try {
-                addMessage('step1Messages', 'user', response);
-
-                const result = await callWebhook(WEBHOOKS.step1, {
-                    session_id: sessionData.session_id,
-                    response: response,
-                    profile: sessionData.profile
-                });
-
-                addMessage('step1Messages', 'bot', `
-                    <strong>Claude's Feedback:</strong><br>
-                    ${result.feedback}
-                `);
-
-                // Continue to Step 2
-                setTimeout(() => {
-                    updateProgress('Step 2: When to Be Yourself / When to Push');
-                    showStep('step2');
-                    
-                    addMessage('step2Messages', 'bot', `
-                        <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
-                        <p>Reflect on what came up in your description.</p>
-                        <p><strong>Now let's explore when your tendencies work for you and when they work against you.</strong></p>
-                    `);
-                }, 1000);
-
-            } catch (error) {
-                console.error('Step 1 error:', error);
-                showError('step1Error', 'Error getting feedback. Please try again.');
-                btn.disabled = false;
-                btn.textContent = 'Submit';
-            }
-        }
-
-        // Step 2: When Helps/Holds Back
-        async function submitStep2() {
-            const helps = document.getElementById('step2Helps').value.trim();
-            const holds = document.getElementById('step2Holds').value.trim();
-            
-            if (helps.length < 30 || holds.length < 30) {
-                showError('step2Error', 'Please write at least one example for each (30+ characters)');
-                return;
-            }
-
-            clearError('step2Error');
-            const btn = document.getElementById('step2Btn');
-            btn.disabled = true;
-            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
-
-            try {
-                addMessage('step2Messages', 'user', `
-                    <strong>When it helps:</strong> ${helps}<br><br>
-                    <strong>When it holds back:</strong> ${holds}
-                `);
-
-                const result = await callWebhook(WEBHOOKS.step2, {
-                    session_id: sessionData.session_id,
-                    when_helps: helps,
-                    when_holds_back: holds,
-                    profile: sessionData.profile
-                });
-
-                addMessage('step2Messages', 'bot', `
-                    <strong>Claude's Feedback:</strong><br>
-                    ${result.feedback}
-                `);
-
-                // Continue to Step 3
-                setTimeout(() => {
-                    updateProgress('Step 3: Your Commitments');
-                    showStep('step3');
-                    
-                    addMessage('step3Messages', 'bot', `
-                        <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
-                        <p><strong>What are 1–2 things you want to pay attention to in future conflicts?</strong></p>
-                        <p>This could be:</p>
-                        <ul>
-                            <li>A technique from your profile insights</li>
-                            <li>A behavior you want to experiment with</li>
-                            <li>A pattern you want to interrupt</li>
-                        </ul>
-                        <p>List 1–2 micro-commitments.</p>
-                    `);
-                }, 1000);
-
-            } catch (error) {
-                console.error('Step 2 error:', error);
-                showError('step2Error', 'Error getting feedback. Please try again.');
-                btn.disabled = false;
-                btn.textContent = 'Submit';
-            }
-        }
-
-        // Step 3: Commitments
-        async function submitStep3() {
-            const commitments = document.getElementById('step3Input').value.trim();
-            
-            if (commitments.length < 30) {
-                showError('step3Error', 'Please write at least 30 characters');
-                return;
-            }
-
-            clearError('step3Error');
-            const btn = document.getElementById('step3Btn');
-            btn.disabled = true;
-            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
-
-            try {
-                addMessage('step3Messages', 'user', commitments);
-
-                const result = await callWebhook(WEBHOOKS.step3, {
-                    session_id: sessionData.session_id,
-                    commitments: commitments,
-                    profile: sessionData.profile
-                });
-
-                addMessage('step3Messages', 'bot', `
-                    <strong>Claude's Feedback:</strong><br>
-                    ${result.feedback}
-                `);
-
-                // Continue to Step 4
-                setTimeout(() => {
-                    updateProgress('Step 4: Leadership Challenge');
-                    showStep('step4');
-                    
-                    addMessage('step4Messages', 'bot', `
-                        <div class="profile-badge">Your Profile: ${sessionData.profile}</div>
-                        <p><strong>Apply your insights to a real leadership challenge.</strong></p>
-                        <p>Choose one scenario below that resonates with you:</p>
-                    `);
-                }, 1000);
-
-            } catch (error) {
-                console.error('Step 3 error:', error);
-                showError('step3Error', 'Error getting feedback. Please try again.');
-                btn.disabled = false;
-                btn.textContent = 'Submit';
-            }
-        }
-
-        // Step 4: Leadership Challenge
-        function selectScenario(num) {
-            selectedScenario = num;
-            
-            // Highlight selected
-            document.querySelectorAll('.scenario-card').forEach((card, idx) => {
-                card.classList.toggle('selected', idx + 1 === num);
-            });
-
-            // Show response area
-            document.getElementById('scenarioSelection').style.display = 'none';
-            document.getElementById('scenarioResponse').style.display = 'block';
-
-            const scenarios = [
-                'The Overly Demanding Boss',
-                'The Uneven Study Group or Project Team',
-                'The Roommate Rituals or Close-Quarters Colleague'
-            ];
-
-            addMessage('step4Messages', 'user', `I chose: ${scenarios[num - 1]}`);
-            addMessage('step4Messages', 'bot', `
-                <p>Great choice. Now reflect on how your BRAVE profile (${sessionData.profile}) shapes your response to this situation.</p>
-                <p><strong>Consider:</strong></p>
-                <ul>
-                    <li>What's your default reaction?</li>
-                    <li>How do your tendencies help or hinder you here?</li>
-                    <li>What's ONE specific thing you'll try differently?</li>
-                </ul>
-            `);
-        }
-
-        async function submitStep4() {
-            const response = document.getElementById('step4Response').value.trim();
-            const commitment = document.getElementById('step4Commitment').value.trim();
-            
-            if (response.length < 50 || commitment.length < 20) {
-                showError('step4Error', 'Please complete both fields with sufficient detail');
-                return;
-            }
-
-            clearError('step4Error');
-            const btn = document.getElementById('step4Btn');
-            btn.disabled = true;
-            btn.innerHTML = 'Getting feedback<span class="loading"></span>';
-
-            try {
-                addMessage('step4Messages', 'user', `
-                    <strong>My reflection:</strong> ${response}<br><br>
-                    <strong>My commitment:</strong> ${commitment}
-                `);
-
-                const result = await callWebhook(WEBHOOKS.step4, {
-                    session_id: sessionData.session_id,
-                    challenge_choice: selectedScenario.toString(),
-                    response: response,
-                    commitment: commitment,
-                    profile: sessionData.profile
-                });
-
-                addMessage('step4Messages', 'bot', `
-                    <strong>Claude's Feedback:</strong><br>
-                    ${result.feedback}
-                `);
-
-                // Complete workshop
-                setTimeout(() => {
-                    updateProgress('Workshop Complete! ✅');
-                    showStep('stepComplete');
-                    
-                    addMessage('completeMessages', 'bot', `
-                        <h3>🎯 Your Workshop Summary</h3>
-                        <div style="background: #f0f4f8; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <p><strong>Name:</strong> ${sessionData.student_name}</p>
-                            <p><strong>BRAVE Profile:</strong> ${sessionData.profile}</p>
-                            <p><strong>Session ID:</strong> ${sessionData.session_id}</p>
-                        </div>
-                        <p>All your responses have been saved to your session. You can now:</p>
-                        <ul>
-                            <li>Review your insights in the assignment survey</li>
-                            <li>Share learnings with your study group</li>
-                            <li>Practice your commitments in real conflicts</li>
-                        </ul>
-                        <p style="margin-top: 20px;">
-                            <a href="https://go.martinschweinsberg.de/personal" target="_blank" style="color: #667eea; font-weight: 600;">
-                                📤 Submit Your Reflection Survey →
-                            </a>
-                        </p>
-                    `);
-                }, 1000);
-
-            } catch (error) {
-                console.error('Step 4 error:', error);
-                showError('step4Error', 'Error getting feedback. Please try again.');
-                btn.disabled = false;
-                btn.textContent = 'Submit';
-            }
-        }
+        // Initialize the application
+        window.addEventListener('DOMContentLoaded', () => {
+            new WorkshopUI();
+        });
     </script>
 </body>
 </html>
