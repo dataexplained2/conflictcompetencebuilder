@@ -291,39 +291,32 @@
         /**
          * CONFIGURATION INSTRUCTIONS:
          *
-         * Replace 'YOUR_WEBHOOK_ID_HERE' with your actual Make.com webhook ID.
+         * Replace each 'YOUR_WEBHOOK_ID_HERE' with your actual Make.com webhook URLs.
+         * You have 4 separate webhooks for each step of the workshop.
          *
-         * To get your webhook URL:
-         * 1. Go to Make.com and create a new scenario
-         * 2. Add a "Webhooks > Custom webhook" trigger
-         * 3. Copy the webhook URL (it will look like: https://hook.us1.make.com/abc123xyz...)
-         * 4. Paste the full URL below
+         * To get your webhook URLs:
+         * 1. Go to Make.com and create 4 separate scenarios (or use your existing ones)
+         * 2. Add a "Webhooks > Custom webhook" trigger to each
+         * 3. Copy each webhook URL and paste below
          *
          * Example:
-         * const WEBHOOK_URL = 'https://hook.us1.make.com/abc123xyz456';
-         *
-         * The webhook will receive JSON data with the following structure:
-         * {
-         *   "studentName": "John",
-         *   "profile": "Agreeableness:Low, Balance:High, Exploration:Low",
-         *   "profileKey": "A↓ B↑ E↓",
-         *   "responses": {
-         *     "step1": "My conflict style description...",
-         *     "step2_helps": "When my tendencies help...",
-         *     "step2_holds": "When they hold me back...",
-         *     "step3": "What I'll pay attention to...",
-         *     "scenario": "boss",
-         *     "scenarioResponse": "My reflection...",
-         *     "commitment": "What I'll do differently...",
-         *     "closing": "My closing thoughts..."
-         *   },
-         *   "milestone": "completed",
-         *   "currentStep": "complete",
-         *   "completedDate": "2024-01-15T10:30:00.000Z",
-         *   "timestamp": 1705318200000
-         * }
+         * const WEBHOOK_STEP1 = 'https://hook.us1.make.com/abc123step1';
+         * const WEBHOOK_STEP2 = 'https://hook.us1.make.com/abc123step2';
+         * const WEBHOOK_STEP3 = 'https://hook.us1.make.com/abc123step3';
+         * const WEBHOOK_STEP4 = 'https://hook.us1.make.com/abc123step4';
          */
-        const WEBHOOK_URL = 'https://hook.us1.make.com/YOUR_WEBHOOK_ID_HERE';
+
+        // Step 1: Describe Your Conflict Style
+        const WEBHOOK_STEP1 = 'https://hook.eu2.make.com/lvk3mmq8wcwr0c3v6cgw7thtpzinpzwi';
+
+        // Step 2: When to Be Yourself / When to Push
+        const WEBHOOK_STEP2 = 'https://hook.eu2.make.com/oks4usf72tsvye331742k35gdlgurmyg';
+
+        // Step 3: What to Pay Attention To
+        const WEBHOOK_STEP3 = 'https://hook.eu2.make.com/3xp4gp60ty56xvsgbh7joh6v28bq9i9c';
+
+        // Step 4: Leadership Challenge & Commitment
+        const WEBHOOK_STEP4 = 'https://hook.eu2.make.com/zctqzvqr5hhhm859j5klau7c1apd3usb';
 
         // ======================
         // UTILITY FUNCTIONS
@@ -338,10 +331,11 @@
          * - Backslashes
          * - Unicode characters
          *
+         * @param {string} webhookUrl - The webhook URL to send data to
          * @param {Object} data - The data object to send
          * @returns {Promise<Object>} Response from webhook
          */
-        async function sendToWebhook(data) {
+        async function sendToWebhook(webhookUrl, data) {
             try {
                 // JSON.stringify automatically and correctly escapes all special characters
                 // No manual escaping needed - doing so would cause double-escaping
@@ -352,7 +346,7 @@
 
                 console.log('Webhook payload preview:', payload.substring(0, 200) + '...');
 
-                const response = await fetch(WEBHOOK_URL, {
+                const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1005,7 +999,7 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                 
                 const btn = document.createElement('button');
                 btn.textContent = 'SUBMIT';
-                btn.onclick = () => {
+                btn.onclick = async () => {
                     const response = document.getElementById('step1Input').value.trim();
                     if (response.length < 50) {
                         alert('Please write at least 3-5 sentences (50+ characters)');
@@ -1015,20 +1009,23 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                     this.state.step = 'peer-coaching-1';
                     this.state.saveState();
                     this.addMessage('user', response);
-                    
+
                     // Provide micro-feedback
                     this.addMessage('bot', `
                         <div class="profile-badge">Your profile: ${profileStr}</div>
-                        
+
                         <p>Thank you for sharing, ${this.state.studentName}. I can see how your ${profileStr.split(',')[0].split(':')[1]} Agreeableness and ${profileStr.split(',')[1].split(':')[1]} Balance shape your approach. Your description shows self-awareness about your natural patterns.</p>
-                        
+
                         <p><strong>One observation:</strong> Notice how your tendencies create both strengths and potential blind spots in how you navigate disagreement.</p>
-                        
+
                         <p><strong>Clarifying question:</strong> When you encounter conflict, what usually happens first—do you feel it in your body, think about it strategically, or notice the impact on the relationship?</p>
-                        
+
                         <p><em>(Take a moment to reflect on this, then continue when ready.)</em></p>
                     `);
-                    
+
+                    // Send Step 1 data to webhook
+                    await this.submitToWebhook('step1', 'step1_completed');
+
                     this.renderCurrentStep();
                 };
                 
@@ -1136,32 +1133,35 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                 
                 const btn = document.createElement('button');
                 btn.textContent = 'SUBMIT';
-                btn.onclick = () => {
+                btn.onclick = async () => {
                     const helps = document.getElementById('helpsInput').value.trim();
                     const holds = document.getElementById('holdsInput').value.trim();
-                    
+
                     if (helps.length < 20 || holds.length < 20) {
                         alert('Please provide thoughtful responses for both questions');
                         return;
                     }
-                    
+
                     this.state.responses.step2_helps = helps;
                     this.state.responses.step2_holds = holds;
                     this.state.step = 'peer-coaching-2';
                     this.state.saveState();
                     this.addMessage('user', `<strong>When my tendencies help:</strong><br>${helps}<br><br><strong>When they hold me back:</strong><br>${holds}`);
-                    
+
                     // Provide micro-feedback
                     this.addMessage('bot', `
                         <div class="profile-badge">Your profile: ${profileStr}</div>
-                        
+
                         <p>Excellent reflection, ${this.state.studentName}. I can see the core tension in your pattern: you recognize both the value and the limitations of your natural approach.</p>
-                        
+
                         <p><strong>One strategic adjustment:</strong> The key is noticing WHEN you're in a situation that calls for your natural strengths versus when you need to deliberately shift. That awareness is half the battle.</p>
-                        
+
                         <p>Ready for the final coaching round to turn this insight into action.</p>
                     `);
-                    
+
+                    // Send Step 2 data to webhook
+                    await this.submitToWebhook('step2', 'step2_completed');
+
                     this.renderCurrentStep();
                 };
                 
@@ -1250,27 +1250,30 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                 
                 const btn = document.createElement('button');
                 btn.textContent = 'SUBMIT';
-                btn.onclick = () => {
+                btn.onclick = async () => {
                     const response = document.getElementById('step3Input').value.trim();
                     if (response.length < 20) {
                         alert('Please provide at least 1-2 specific commitments');
                         return;
                     }
-                    
+
                     this.state.responses.step3 = response;
                     this.state.step = 'step4-intro';
                     this.state.saveState();
                     this.addMessage('user', response);
-                    
+
                     // Provide micro-feedback
                     this.addMessage('bot', `
                         <div class="profile-badge">Your profile: ${profileStr}</div>
-                        
+
                         <p>Strong commitments, ${this.state.studentName}. These are specific enough to actually notice and act on. Your commitments connect directly to your profile's key challenges and opportunities.</p>
-                        
+
                         <p>Now let's apply your insights to a real leadership challenge.</p>
                     `);
-                    
+
+                    // Send Step 3 data to webhook
+                    await this.submitToWebhook('step3', 'step3_completed');
+
                     this.renderCurrentStep();
                 };
                 
@@ -1414,8 +1417,8 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                         <p>Excellent commitment, ${this.state.studentName}. That's concrete and actionable. The key now is to actually try it in your next conflict situation and notice what happens.</p>
                     `);
 
-                    // Send milestone data to webhook (Step 4 completion)
-                    await this.submitToWebhook('step4_completed');
+                    // Send Step 4 data to webhook
+                    await this.submitToWebhook('step4', 'step4_completed');
 
                     this.renderCurrentStep();
                 };
@@ -1516,7 +1519,7 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                 
                 const btn = document.createElement('button');
                 btn.textContent = 'FINISH WORKSHOP';
-                btn.onclick = async () => {
+                btn.onclick = () => {
                     const response = document.getElementById('closingInput').value.trim();
                     if (response.length < 10) {
                         alert('Please share a brief closing thought');
@@ -1527,10 +1530,6 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                     this.state.step = 'complete';
                     this.state.saveState();
                     this.addMessage('user', response);
-
-                    // Send workshop completion data to webhook
-                    await this.submitToWebhook();
-
                     this.renderCurrentStep();
                 };
                 
@@ -1579,22 +1578,43 @@ You realize: this is low-stakes practice for workplace friction. How you handle 
                 this.inputArea.appendChild(resetBtn);
             }
 
-            async submitToWebhook(milestone = 'completed') {
+            async submitToWebhook(step, milestone = 'completed') {
                 // Prepare data payload with all user responses
                 const data = {
                     studentName: this.state.studentName,
                     profile: this.state.getProfileString(),
                     profileKey: this.state.profile ? this.state.profile.key : '',
                     responses: this.state.responses,
+                    step: step,
                     milestone: milestone,
                     currentStep: this.state.step,
                     completedDate: new Date().toISOString(),
                     timestamp: Date.now()
                 };
 
+                // Determine which webhook to use based on step
+                let webhookUrl;
+                switch(step) {
+                    case 'step1':
+                        webhookUrl = WEBHOOK_STEP1;
+                        break;
+                    case 'step2':
+                        webhookUrl = WEBHOOK_STEP2;
+                        break;
+                    case 'step3':
+                        webhookUrl = WEBHOOK_STEP3;
+                        break;
+                    case 'step4':
+                        webhookUrl = WEBHOOK_STEP4;
+                        break;
+                    default:
+                        console.error('Unknown step:', step);
+                        return { success: false, error: 'Unknown step' };
+                }
+
                 // Send to Make.com webhook
-                console.log(`Sending workshop data to webhook (${milestone})...`);
-                const result = await sendToWebhook(data);
+                console.log(`Sending workshop data to webhook (${step}, ${milestone})...`);
+                const result = await sendToWebhook(webhookUrl, data);
 
                 if (result.success === false) {
                     console.error('Failed to send data to webhook:', result.error);
